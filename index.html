@@ -3,271 +3,366 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>GigChain.io — Blockchain-Powered Gig Economy</title>
-  <!-- Fonts: Futuristic & readable -->
-  <link href="https://fonts.googleapis.com/css?family=Orbitron:700|Montserrat:400,600&display=swap" rel="stylesheet">
+  <title>GigChainWebLite — Next-Gen Blockchain Gig Platform</title>
+  <link href="https://fonts.googleapis.com/css?family=Orbitron:700|Montserrat:400,700&display=swap" rel="stylesheet">
   <style>
+    /* --- global --- */
     body {
       margin: 0; padding: 0;
       font-family: 'Montserrat', Arial, sans-serif;
-      background: radial-gradient(ellipse at top left, #282954 50%, #22ffd6 180%);
-      color: #f0fff7;
+      /* Glassmorphic bg + animated gradient */
+      background: linear-gradient(120deg, #17113a 0%, #24ffd6 100%);
       min-height: 100vh;
+      color: #f0fafd;
+      position: relative;
+      overflow-x: hidden;
     }
+    .particle-bg {
+      position: fixed;
+      width: 100vw; height: 100vh; z-index: 0;
+      left: 0; top: 0; pointer-events: none;
+      opacity: 0.38;
+    }
+    /* --- hero --- */
     .hero {
-      padding: 72px 0 24px 0;
-      background: linear-gradient(135deg, #121425 70%, #3cffb7 150%);
-      box-shadow: 0 12px 40px 0 #24d9b044;
+      padding: 80px 0 48px 0;
       text-align: center;
       position: relative;
-      overflow: hidden;
+      z-index: 2;
     }
     .hero-title {
       font-family: 'Orbitron', 'Montserrat', sans-serif;
-      font-size: 2.9em;
-      color: #24ffd6;
-      letter-spacing: 0.13em;
-      text-shadow: 0 4px 28px #24d9b055, 0 0 8px #44f6e0;
-    }
-    .hero-highlight {
-      font-weight: 700;
-      color: #2bffa2;
-      background: -webkit-linear-gradient(60deg, #39fff9, #b2fb53);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      font-size: 1.15em;
+      font-size: 2.8em;
+      color: #25ffe6;
+      text-shadow: 0 4px 30px #2bffa2bb, 0 0 15px #39fff990;
+      letter-spacing: 0.1em;
     }
     .hero-desc {
-      font-size: 1.15em;
-      max-width: 600px;
-      margin: 1.1em auto 1.7em auto;
-      color: #dafdfa;
-      text-shadow: 0 3px 7px #22ffb480;
+      color: #d3fdf7;
+      font-size: 1.24em;
+      max-width: 700px;
+      margin: 15px auto 22px auto;
+      line-height: 1.45;
+      text-shadow: 0 2px 11px #22ffd740;
     }
-    .glow-card {
-      background: rgba(25, 24, 90, 0.75);
-      border-radius: 17px;
-      box-shadow: 0 0 18px 3px #27ffbc85, 0 2px 40px #29a2cf40;
-      border: 1.6px solid #2bffa2aa;
-      padding: 30px 25px;
-      margin: 30px auto 38px auto;
-      max-width: 900px;
-      transition: box-shadow 0.23s;
-      backdrop-filter: blur(7px);
-      position: relative;
-    }
-    .glow-card:hover {
-      box-shadow: 0 0 36px 10px #37fff7dd, 0 10px 60px #20799f60;
-    }
-    .features {
-      display: flex;
-      gap: 34px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-    .feature-block {
-      flex: 1 1 270px;
-      background: rgba(43,255,162,0.11);
-      border: 1.1px solid #24ffd688;
-      border-radius: 10px;
-      padding: 19px 16px 17px 16px;
-      min-width: 210px; max-width: 330px;
-      color: #fff;
-      box-shadow: 0 2px 14px 0 #22ffd699;
-      margin: 9px 0;
-      text-align: left;
-    }
-    .feature-block h3 {
-      color: #25dbc7;
+    .hero-btn {
       font-family: 'Orbitron', 'Montserrat', sans-serif;
-      font-size: 1.18em; margin: 0 0 7px 0;
-      letter-spacing: 0.02em;
-    }
-    .feature-block .emoji {
-      font-size: 1.33em; margin-right: 6px;
-    }
-    .links-bar {
-      display: flex;
-      justify-content: center;
-      gap: 32px;
-      margin: 37px 0 23px 0;
-      font-size: 1.08em;
-    }
-    .link-btn {
-      background: #2bffa2eb;
-      color: #151927;
-      font-family: 'Orbitron', 'Montserrat', sans-serif;
-      text-decoration: none;
-      font-size: 1.12em;
-      font-weight: bold;
-      padding: 15px 33px;
-      border-radius: 8px;
-      box-shadow: 0 7px 18px #26ffd586;
-      transition: background 0.15s;
+      font-size: 1.14em; font-weight: bold;
+      background: rgba(34,255,166,0.9);
+      color: #181a2b;
       border: none;
-      letter-spacing: 0.03em;
+      border-radius: 9px;
+      padding: 16px 38px;
+      box-shadow: 0 4px 20px #21fbb27c;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      transition: background 0.15s, color 0.2s, transform 0.15s;
+      margin-top: 22px;
     }
-    .link-btn:hover {
-      background: #201474;
-      color: #24ffc4;
+    .hero-btn:hover { background: #20145c; color: #2bffa2; transform: scale(1.07); }
+    /* --- glass cards --- */
+    .glass-section {
+      max-width: 970px; margin: 44px auto; padding: 38px 33px;
+      background: rgba(29,37,89,0.79);
+      border-radius: 19px;
+      box-shadow: 0 2px 38px #2bffa2a2, 0 7px 30px #24ffd633;
+      backdrop-filter: blur(6px);
+      position: relative;
+      z-index: 2;
     }
-    .section {
-      background: rgba(22,47,74,0.35);
-      border-radius: 15px;
-      max-width: 900px;
-      margin: 40px auto 0 auto;
-      box-shadow: 0 3px 16px #2bffa244;
-      padding: 36px 32px;
-      color: #effff6;
+    .features-row {
+      display: flex; gap: 40px; flex-wrap: wrap; justify-content: center;
+      margin-top: 36px; margin-bottom: 20px;
     }
-    .section-title {
-      color: #24ffd6;
-      font-family: 'Orbitron', 'Montserrat', sans-serif;
-      font-size: 1.35em;
-      letter-spacing: 0.03em;
-      margin-bottom: 12px;
-      margin-top: 0;
+    .feature-card {
+      background: rgba(35,255,178,0.15);
+      border-radius: 11px;
+      border: 2px solid #21ffd698;
+      box-shadow: 0 2px 13px #22ffd610;
+      min-width: 210px; max-width: 320px;
+      padding: 25px 19px 18px 19px;
+      margin: 10px 0; color: #f3fdff;
+      text-align: left;
+      font-size: 1.04em;
+      position: relative;
+      transition: box-shadow 0.16s;
     }
-    .faq-list, .roadmap-list {
-      list-style: none; padding: 0; margin: 16px 0 0 0;
+    .feature-card:hover { box-shadow: 0 0 32px #42ffa266; }
+    .feature-card h3 { color: #2bffa2; margin:0 0 10px 0; font-family: 'Orbitron'; font-size: 1.12em;}
+    .feature-emoji {font-size: 1.38em; margin-right: 8px;}
+    /* Animated counters/roadmap */
+    .roadmap-row { margin: 32px 0 0 0; display: flex; gap: 28px; flex-wrap: wrap; }
+    .roadmap-step {
+      background: rgba(42,255,179,0.13); border-radius: 8px;
+      padding: 19px 14px; width: 240px; color: #61fdc5;
+      font-family: 'Orbitron';
+      box-shadow: 0 2px 10px #20ffc289;
+      position: relative; font-size: 1.08em;
+      border-left: 5px solid #2bffa2;
+      margin-bottom: 14px; margin-top: 11px;
+      overflow: hidden;
     }
-    .faq-list li, .roadmap-list li {margin-bottom: 18px;}
-    .faq-q {color: #2bffa2; font-weight: bold;}
-    .roadmap-step {margin-bottom: 9px;}
-    .team-list {
-      display: flex;
-      gap: 28px;
-      flex-wrap: wrap;
-      justify-content: center;
-      margin-top: 18px;
+    .progress-bar-outer {
+      width: 100%; height: 8px; background: #203549; border-radius: 7px; margin-top: 12px;
+      position: relative; overflow: hidden;
     }
-    .team-card {
-      background: rgba(0,255,128,0.09);
-      border: 1px solid #42ffcc90;
-      border-radius: 10px;
-      padding: 17px;
-      width: 215px;
+    .progress-bar-inner {
+      height: 8px; background: linear-gradient(90deg,#2bffa2,#38e5fe); border-radius: 7px;
+      position: absolute; left: 0; top: 0;
+      width: 0; transition: width 1.2s cubic-bezier(.8,-0.9,.22,1.69);
+    }
+    /* Gamified profiles preview */
+    .profile-preview-card {
+      background: rgba(34,255,160,0.13);
+      border-radius: 15px; border: 1.5px solid #21ffd6aa;
+      box-shadow: 0 2px 10px #38ffa255;
+      padding: 22px 20px; max-width: 300px; margin: 30px auto 12px auto;
       text-align: center;
-      margin-bottom: 11px;
-      box-shadow: 0 1px 7px #22ffd6a6;
     }
-    .team-name {
-      color: #2bffa2; font-weight: 600; font-size: 1.07em; margin: 7px 0 0 0;
-    }
-    .team-role {font-size: 0.96em; color: #a9ffe6;}
-    footer {
-      text-align: center; padding: 35px 0 12px 0;
-      color: #5cfccb;
-      font-size: 1em;
-      background: none;
-    }
-    @media (max-width: 850px) {
-      .glow-card, .section {padding: 8px;}
-      .features {flex-direction: column; align-items: center;}
-      .team-list {flex-direction: column;}
+    .badge {display:inline-block; margin:6px 6px 2px 6px; padding:5px 9px;border-radius:12px;
+      background: linear-gradient(90deg, #22ffd6 0%, #5fd0fb 120%);
+      color:#161a3c; font-weight:600; font-size:0.97em;}
+    /* FAQ accordion */
+    .faq-card { margin: 45px auto 0 auto; max-width: 700px; }
+    .faq-section-title {font-family:'Orbitron'; color:#33fdef;font-size:1.31em; letter-spacing:0.01em;}
+    .faq-list {list-style:none; padding:0; margin:0;}
+    .faq-item {margin-bottom:14px; background:rgba(34,255,160,0.08); border-radius:8px; box-shadow:0 1px 4px #42ffa255;}
+    .faq-q {color:#2bffa2; font-weight:700; cursor:pointer; padding:13px; display:block;}
+    .faq-a {display:none;padding:13px;padding-top:2px;color:#c5ffe9;}
+    .faq-item.active .faq-a {display:block;}
+    /* Demo walkthrough */
+    .demo-btn {background:#2bffa2;color:#151927;font-family:'Orbitron';font-size:1em;font-weight:600;padding:9px 21px;border-radius:7px;box-shadow:0 2px 9px #20ffbe93;border:none;margin-top:16px;cursor:pointer;}
+    .demo-btn:hover{background:#17113a;color:#35ffe2;}
+    /* Team flipcards */
+    .team-row {display:flex;gap:34px;justify-content:center;flex-wrap:wrap;margin-top:28px;}
+    .team-card{background:rgba(45,255,160,0.13);border-radius:11px;padding:17px;width:205px;box-shadow:0 1px 8px #22ffa296;text-align:center;cursor:pointer;position:relative;transition:transform .17s;}
+    .team-card:hover{transform:scale(1.08);}
+    .team-front{min-height:57px;}
+    .team-back{display:none;position:absolute;z-index:3;left:0;top:0;background:rgba(22,47,74,0.99);width:100%;height:100%;border-radius:11px;}
+    .team-card.flipped .team-front{display:none;}
+    .team-card.flipped .team-back{display:block;}
+    .team-role{color:#a7ffe6;font-size:0.93em;}
+    /* Social proofs */
+    .social-proof-row{margin:30px auto 0 auto;max-width:670px;text-align:center;}
+    .sp-badge{display:inline-block;padding:10px 18px;border-radius:8px;background:rgba(34,255,160,0.18);color:#2bffa2;font-weight:700;margin:2px 10px 7px 0;font-size:0.98em;}
+    /* Video teaser */
+    .video-row{text-align:center;margin:40px auto 0 auto;}
+    .teaser-video{width:380px;max-width:97vw;border-radius:17px;box-shadow:0 2px 18px #20ffe093;}
+    /* Modal/join beta */
+    .modal-backdrop{display:none;position:fixed;left:0;top:0;width:100vw;height:100vh;background:#201a3aa6;z-index:99;}
+    .modal-content{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);background:#181a2b;border-radius:15px;padding:34px 28px;box-shadow:0 7px 45px #22ffd6a8;z-index:100;max-width:320px;width:95vw;text-align:center;color:#2bffa2;}
+    .modal-content h3{margin:0 0 14px 0;font-family:'Orbitron';font-size:1.25em;}
+    .modal-input{width:80%;font-size:1em;padding:8px 9px;border-radius:5px;border:1px solid #20ffc2;margin:12px 0 9px 0;}
+    .modal-btn{background:#2bffa2;color:#151927;font-family:'Orbitron';font-size:1em;font-weight:600;padding:8px 21px;border-radius:7px;box-shadow:0 2px 9px #20ffbe93;border:none;margin-top:5px;cursor:pointer;}
+    /* Wallet/testnet demo */
+    .wallet-demo-row{text-align:center;margin-top:33px;}
+    .wallet-demo-btn{background:#22ffd6;color:#161a2b;font-family:'Orbitron';font-size:1em;font-weight:600;padding:8px 18px;border-radius:7px;box-shadow:0 2px 9px #21ffbe53;border:none;}
+    .wallet-demo-btn:hover{background:#181a2b;color:#22ffd6;}
+    /* Responsive fix */
+    @media (max-width:900px){
+      .features-row, .roadmap-row, .team-row{flex-direction:column;align-items:center;}
+      .glass-section{padding:10px;}
     }
   </style>
 </head>
 <body>
+  <!-- Animated Background (use a real JS particle lib for coolness, here simple circles) -->
+  <canvas class="particle-bg" id="particleBG"></canvas>
+  <script>
+  // Basic animated particles (replace with blockchain lines/cubes as needed)
+  const canvas = document.getElementById('particleBG');
+  if (canvas.getContext) {
+    const ctx = canvas.getContext('2d');
+    let w = window.innerWidth, h = window.innerHeight;
+    canvas.width = w; canvas.height = h;
+    let particles = Array.from({length:42},()=>({x:Math.random()*w,y:Math.random()*h,r:Math.random()*24+8,s:Math.random()*2+1}));
+    function drawParticles() {
+      ctx.clearRect(0,0,w,h);
+      for(const p of particles){
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, 2*Math.PI); ctx.fillStyle='rgba(34,255,166,0.12)';
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r*0.7, 0, 2*Math.PI); ctx.strokeStyle='rgba(42,255,200,0.2)'; ctx.stroke();
+        p.y+=(p.s); if(p.y-p.r>h) p.y=0-p.r;
+      }
+      requestAnimationFrame(drawParticles);
+    }
+    drawParticles();
+  }
+  </script>
+
+  <!-- Hero Section -->
   <div class="hero">
-    <div class="hero-title">
-      GigChain.io
-    </div>
+    <div class="hero-title">GigChainWebLite</div>
     <div class="hero-desc">
-      <span class="hero-highlight">Blockchain-Powered Gigs. Global Trust. Next-Gen Automation.</span><br>
-      Meet the new work economy: AI-powered contracts, borderless payments, game-level reputation, and open access for all. 
+      Blockchain-powered gigs. Instant payments. AI contracts. Join the <b>future of work</b> built by <span style="color:#2bffa2;font-weight:700;">Lejzer Traña</span>.<br>
+      <span style="color:#9fffcf">Open-source intro at <a href="https://github.com/Lento47/GigChain" target="_blank" style="color:#2bffa2">GigChain</a></span>.
     </div>
-    <div style="color:#7af7e4;font-size:1.08em;">
-      Founded by <span class="hero-highlight">Lejzer Traña</span>
+    <button class="hero-btn" id="joinBetaBtn">Join Beta</button>
+  </div>
+
+  <!-- Modal for Join Beta -->
+  <div class="modal-backdrop" id="modalBackdrop"></div>
+  <div class="modal-content" id="modalBox" style="display:none;">
+    <h3>Get Early Access</h3>
+    <input type="email" class="modal-input" placeholder="Your email (demo)" id="joinEmail"/>
+    <button class="modal-btn" onclick="document.getElementById('modalBox').style.display='none';document.getElementById('modalBackdrop').style.display='none';alert('Demo: Thanks!')">Submit</button>
+    <div style="color:#8fffd7;margin-top:7px;font-size:0.96em;">You’ll get notified when alpha launches.</div>
+  </div>
+  <script>
+    document.getElementById('joinBetaBtn').onclick=function(){
+      document.getElementById('modalBox').style.display='block';
+      document.getElementById('modalBackdrop').style.display='block';
+    };
+    document.getElementById('modalBackdrop').onclick=function(){
+      document.getElementById('modalBox').style.display='none';
+      document.getElementById('modalBackdrop').style.display='none';
+    };
+  </script>
+
+  <!-- Glass Features Section -->
+  <div class="glass-section">
+    <div class="features-row">
+      <div class="feature-card">
+        <h3><span class="feature-emoji">🤖</span>AI Contracts & Agents</h3>
+        <div>Frictionless contract generation, negotiation, and quality with advanced agents.</div>
+      </div>
+      <div class="feature-card">
+        <h3><span class="feature-emoji">🔐</span>Web3 Wallet Auth</h3>
+        <div>Instant login, Proof of Identity, testnet trials—no passwords ever.</div>
+      </div>
+      <div class="feature-card">
+        <h3><span class="feature-emoji">💼</span>Marketplace & Payments</h3>
+        <div>Escrow, milestones, XP, badges, NFT rewards and more—live and on-chain.</div>
+      </div>
+      <div class="feature-card">
+        <h3><span class="feature-emoji">🎮</span>Gamified Profiles</h3>
+        <div>Earn reputation, level up, customize badges, and preview your blockchain score.</div>
+      </div>
     </div>
-    <div class="links-bar">
-      <a class="link-btn" href="https://github.com/Lento47/GigChain" target="_blank">🚀 See the Main Project</a>
-      <a class="link-btn" href="#join">✨ Be First to Try</a>
+    <button class="demo-btn" onclick="alert('Demo: In full app, you could try contract creation!')">Try Live Demo (Preview)</button>
+  </div>
+
+  <!-- Animated Roadmap -->
+  <div class="glass-section">
+    <div style="font-family:'Orbitron';font-size:1.21em;color:#2bffa2;margin-bottom:13px;">Roadmap Progress &#128200;</div>
+    <div class="roadmap-row">
+      <div class="roadmap-step">
+        <b>Q4 2025</b> MVP Launched
+        <div class="progress-bar-outer"><div class="progress-bar-inner" style="width:90%;"></div></div>
+      </div>
+      <div class="roadmap-step">
+        <b>Q1 2026</b> Mobile App (Alpha)
+        <div class="progress-bar-outer"><div class="progress-bar-inner" style="width:60%;"></div></div>
+      </div>
+      <div class="roadmap-step">
+        <b>Q2 2026</b> NFT Reputation & Layer-2
+        <div class="progress-bar-outer"><div class="progress-bar-inner" style="width:32%;"></div></div>
+      </div>
+      <div class="roadmap-step">
+        <b>Q3 2026</b> Global Expansion
+        <div class="progress-bar-outer"><div class="progress-bar-inner" style="width:10%;"></div></div>
+      </div>
     </div>
   </div>
 
-  <div class="glow-card">
-    <div class="features">
-      <div class="feature-block">
-        <h3><span class="emoji">🤖</span>AI Contract Generation</h3>
-        Automated smart contracts, negotiation bots, and dispute mediators with built-in OpenAI.
-      </div>
-      <div class="feature-block">
-        <h3><span class="emoji">🔐</span>Web3 Authentication</h3>
-        Passwordless login, crypto wallets, cryptographic risk scoring, and decentralized identity.
-      </div>
-      <div class="feature-block">
-        <h3><span class="emoji">💼</span>Gig Marketplace</h3>
-        Gigs, payments, XP, levels and NFTs, escrowed and on-chain (Polygon, Ethereum).
-      </div>
-      <div class="feature-block">
-        <h3><span class="emoji">🎮</span>Reputation & Gamification</h3>
-        On-chain profiles, achievements, badges, and transparent feedback for every user.
-      </div>
+  <!-- Gamified Profile Preview -->
+  <div class="profile-preview-card">
+    <div style="font-family:'Orbitron';color:#2bffa2;font-size:1.09em;">Your On-Chain Profile</div>
+    <div style="margin-top:8px;font-size:1.07em;color:#99faee;">Level: <b>VIP 7</b> <span style="font-size:1.21em;">🏆</span></div>
+    <div>XP: 3,120</div>
+    <div style="margin:12px 0 10px 0;">
+      <span class="badge">Smart Contract Pro</span>
+      <span class="badge">GigChain Verified</span>
+      <span class="badge">Dispute Resolver</span>
+      <span class="badge">100+ contracts</span>
     </div>
+    <button class="demo-btn" onclick="alert('Demo: In full app, you could customize your profile!')">Customize Profile (Demo)</button>
   </div>
-  
-  <section class="section">
-    <div class="section-title">Frequently Asked Questions</div>
+
+  <!-- FAQ Accordion -->
+  <div class="faq-card">
+    <div class="faq-section-title">FAQ</div>
     <ul class="faq-list">
-      <li>
-        <span class="faq-q">What is GigChain?</span><br>
-        A decentralized AI-powered platform to connect freelancers and clients through secure blockchain contracts, transparent reputation and instant payments globally.
+      <li class="faq-item">
+        <span class="faq-q">What is GigChain?</span>
+        <span class="faq-a">A decentralized, AI-powered gig marketplace that leverages smart contracts on blockchain for security, reputation, and instant payments.</span>
       </li>
-      <li>
-        <span class="faq-q">How do I get paid?</span><br>
-        Funds flow through smart contract escrow, automatically released on delivery with verification by both parties.
+      <li class="faq-item">
+        <span class="faq-q">Can I really join with just a wallet?</span>
+        <span class="faq-a">Yes! Just connect a testnet or mainnet wallet, no passwords required, and your reputation is stored on-chain.</span>
       </li>
-      <li>
-        <span class="faq-q">What’s different from Upwork/Fiverr?</span><br>
-        No mediators. No commission fees. Transparent reviews, rapid payments, and your on-chain reputation belongs to you.
+      <li class="faq-item">
+        <span class="faq-q">How do contracts work?</span>
+        <span class="faq-a">All gigs post smart contracts (escrow/XP/NFT rewards) with milestones, dispute resolution, and automated payment flow.</span>
       </li>
-      <li>
-        <span class="faq-q">How can I contribute?</span><br>
-        Check <a href="https://github.com/Lento47/GigChain" target="_blank" style="color:#24ffd6;">Once we deploy, there will be a community</a> — code, docs, contracts, or ideas welcome!
+      <li class="faq-item">
+        <span class="faq-q">Where do I report issues or contribute?</span>
+        <span class="faq-a">On our Platform GigChain, when published, we will create a community.</span>
       </li>
     </ul>
-  </section>
+  </div>
+  <script>
+  // FAQ accordion
+  document.querySelectorAll('.faq-q').forEach(el=>{
+    el.onclick=function(){
+      let item=this.parentNode; item.classList.toggle('active');
+    }
+  });
+  </script>
 
-  <section class="section">
-    <div class="section-title">Roadmap</div>
-    <ul class="roadmap-list">
-      <li class="roadmap-step"><b>Q4 2025:</b> MVP (core contracts, AI chat, profiles, escrow) 🚀</li>
-      <li class="roadmap-step"><b>Q1 2026:</b> NFT-based rep, mobile app alpha, multi-currency support</li>
-      <li class="roadmap-step"><b>Q2 2026:</b> DAO setup, advanced analytics, Layer-2 scaling</li>
-      <li class="roadmap-step"><b>Q3 2026:</b> AI auto-matching, global payout expansion, new gig types</li>
-    </ul>
-  </section>
-
-  <section class="section">
-    <div class="section-title">Meet the Team</div>
-    <div class="team-list">
-      <div class="team-card">
-        <div class="team-name">Lejzer Traña</div>
-        <div class="team-role">Founder</div>
-        <div>Building fair, borderless, tech-driven gig work for all.</div>
+  <!-- Team Flip Cards -->
+  <div class="glass-section">
+    <div style="font-family:'Orbitron';color:#2bffa2;font-size:1.21em;margin-bottom:13px;">Team</div>
+    <div class="team-row">
+      <div class="team-card" onclick="this.classList.toggle('flipped')">
+        <div class="team-front">
+          <div style="font-weight:700;">Lejzer Traña</div>
+          <div class="team-role">Founder</div>
+        </div>
+        <div class="team-back">
+          <div style="margin-top:19px;">Built Web3 contracts, AI agents, and the core vision for GigChain. Crypto for all!</div>
+        </div>
       </div>
-      <div class="team-card">
-        <div class="team-name">Open for Builders</div>
-        <div class="team-role">Contributors Welcome</div>
-        <div>Want to build in blockchain, AI, or frontend? <a href="https://github.com/Lento47/GigChain/issues" style="color:#39fff9;">Join us!</a></div>
+      <div class="team-card" onclick="this.classList.toggle('flipped')">
+        <div class="team-front">
+          <div style="font-weight:700;">Open for Builders</div>
+          <div class="team-role">Contributor</div>
+        </div>
+        <div class="team-back">
+          <div style="margin-top:19px;">Want to join? Fork <a href="https://github.com/Lento47/GigChain" style="color:#2bffa2;">GigChain</a> and open a PR!</div>
+        </div>
       </div>
     </div>
-  </section>
+  </div>
 
-  <section class="section" id="join">
-    <div class="section-title">Try Early? Be Notified.</div>
-    <form action="https://formspree.io/f/your-form-id" method="POST" style="margin-top:11px;text-align:center">
-      <input type="email" name="email" required placeholder="Email for invite" style="padding:9px 14px;border-radius:6px;border:1px solid #27ffb9;margin-right:8px;font-size:1em;width:180px;"/>
-      <button class="link-btn" type="submit">Send Me News</button>
-    </form>
-    <div style="color:#31ddbb; font-size:0.98em; margin-top:18px;">
-      Don’t worry, no spam — we’ll ping you when the alpha is open.
-    </div>
-  </section>
+  <!-- Social Proof -->
+  <div class="social-proof-row">
+    <div class="sp-badge">As seen on Polygon Testnet</div>
+    <div class="sp-badge">Powered by OpenAI Agents</div>
+    <div class="sp-badge">Backed by FastAPI & Solidity</div>
+    <div class="sp-badge">Community Driven</div>
+  </div>
+
+  <!-- Video Teaser -->
+  <div class="video-row">
+    <video class="teaser-video" controls autoplay loop muted>
+      <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+      <!-- Replace with real demo when possible -->
+      Sorry, your browser does not support embedded videos.
+    </video>
+    <div style="color:#2bffa2;margin-top:8px;">See how a gig/contract process works!</div>
+  </div>
+
+  <!-- Wallet Demo/Connection -->
+  <div class="wallet-demo-row">
+    <button class="wallet-demo-btn" onclick="alert('Demo: Wallet connected! XP/NFTs awarded (testnet only).')">Connect Testnet Wallet (Demo)</button>
+  </div>
 
   <footer>
-    &copy; 2025 GigChain.io — Launching the decentralized gig economy.<br>
-    <span style="font-size:0.9em;color:#51fcf7;">Blockchain. AI. Freedom to work anywhere.</span>
+    &copy; 2025 GigChainWebLite — For GigChain and the future.<br>
+    <span style="font-size:0.92em;color:#51fcf7;">Blockchain. AI. Work for everyone.</span>
   </footer>
 </body>
 </html>
