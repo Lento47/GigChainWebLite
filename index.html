@@ -1,368 +1,928 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>GigChainWebLite — Next-Gen Blockchain Gig Platform</title>
-  <link href="https://fonts.googleapis.com/css?family=Orbitron:700|Montserrat:400,700&display=swap" rel="stylesheet">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GigChain · AI-Powered Web3 Gig Contracts</title>
+
+  <!-- SEO / Social -->
+  <meta name="description" content="GigChain turns plain text into Web3-ready gig contracts with AI agents, escrow, and wallet-based auth." />
+  <meta property="og:title" content="GigChain · AI-Powered Web3 Gig Contracts" />
+  <meta property="og:description" content="Generate and simulate Web3 gig contracts, W-CSAP auth, and agent chaining—right in your browser." />
+  <meta property="og:type" content="website" />
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b1020" />
+  <link rel="icon" href="data:image/svg+xml;utf8,
+    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
+      <rect width='100' height='100' rx='16' fill='%230B1020'/>
+      <path d='M30 60c8 8 21 8 29 0l11-11c8-8 8-21 0-29-8-8-21-8-29 0l-7 7' fill='none' stroke='%238b5cf6' stroke-width='8' stroke-linecap='round'/>
+      <path d='M70 40c-8-8-21-8-29 0L30 51c-8 8-8 21 0 29 8 8 21 8 29 0l7-7' fill='none' stroke='%2306b6d4' stroke-width='8' stroke-linecap='round'/>
+    </svg>" />
+
   <style>
-    /* --- global --- */
+    /* ========= CSS VARIABLES ========= */
+    :root {
+      --bg-0: #070a17;
+      --bg-1: #0b1020;
+      --bg-2: #101733;
+      --glass: rgba(255,255,255,0.06);
+      --glass-2: rgba(255,255,255,0.08);
+      --stroke: rgba(255,255,255,0.12);
+      --txt: #eaf2ff;
+      --muted: #aab3c8;
+      --p1: #8b5cf6;  /* iris / purple */
+      --p2: #06b6d4;  /* cyan */
+      --p3: #10b981;  /* green */
+      --warn: #ef4444;
+      --radius: 16px;
+      --shadow-1: 0 10px 30px rgba(0,0,0,0.35);
+      --shadow-2: 0 20px 60px rgba(0,0,0,0.45);
+      --grid-stroke: rgba(139,92,246,0.18);
+      --hex-stroke: rgba(6,182,212,0.14);
+    }
+    @media (prefers-color-scheme: light) {
+      :root { --txt:#0b1020; --muted:#3d4460; --glass:rgba(0,0,0,0.04); --glass-2:rgba(0,0,0,0.06); --stroke:rgba(0,0,0,0.08); --bg-0:#f7f8fb; --bg-1:#ffffff; --bg-2:#eef1f7; }
+      body{background:#fff;}
+    }
+
+    /* ========= RESET ========= */
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
     body {
-      margin: 0; padding: 0;
-      font-family: 'Montserrat', Arial, sans-serif;
-      /* Glassmorphic bg + animated gradient */
-      background: linear-gradient(120deg, #17113a 0%, #24ffd6 100%);
-      min-height: 100vh;
-      color: #f0fafd;
-      position: relative;
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+      background: radial-gradient(1200px 700px at 10% -10%, #1b1440 0%, transparent 60%),
+                  radial-gradient(1200px 700px at 110% 10%, #062a38 0%, transparent 60%),
+                  linear-gradient(180deg, var(--bg-0), var(--bg-2));
+      color: var(--txt);
       overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      letter-spacing: .15px;
     }
-    .particle-bg {
-      position: fixed;
-      width: 100vw; height: 100vh; z-index: 0;
-      left: 0; top: 0; pointer-events: none;
-      opacity: 0.38;
+    a { color: inherit; text-decoration: none; }
+
+    /* ========= DECORATIVE BACKGROUNDS ========= */
+    .scene { position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      mask-image: radial-gradient(60% 60% at 50% 40%, #000 65%, transparent 100%); }
+    .grid { position: absolute; inset: -200vmax;
+      background:
+        repeating-linear-gradient(0deg, transparent 0 119px, var(--grid-stroke) 119px 120px),
+        repeating-linear-gradient(90deg, transparent 0 119px, var(--grid-stroke) 119px 120px);
+      transform: perspective(900px) rotateX(60deg) translateY(35%);
+      filter: drop-shadow(0 0 6px rgba(139,92,246,.2));
+      opacity: .35; }
+    .hex { position: absolute; inset: 0; opacity: .45; }
+    .hex svg { width: 100%; height: 100%; display: block; }
+    .scanline { position: absolute; inset: 0; background: linear-gradient(180deg, transparent 0%, rgba(139,92,246,.08) 50%, transparent 100%);
+      mix-blend-mode: screen; transform: translateY(-100%); animation: scan 8s linear infinite; }
+    @keyframes scan { to { transform: translateY(100%);} }
+    @media (prefers-reduced-motion: reduce) { .grid, .scanline { animation: none; transform: none; } }
+
+    /* ========= LAYOUT ========= */
+    header { position: sticky; top: 0; z-index: 10; backdrop-filter: saturate(120%) blur(10px);
+      background: linear-gradient(180deg, rgba(0,0,0,.45), rgba(0,0,0,.15));
+      border-bottom: 1px solid var(--stroke); }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 16px; }
+    .brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: -0.5px; }
+    .brand svg { width: 28px; height: 28px; }
+    .spacer { flex: 1; }
+    .gh { display:inline-flex; align-items:center; gap:.5rem; padding:.55rem .9rem;
+      border:1px solid var(--stroke); border-radius: 999px; background: var(--glass);
+      transition: .2s transform ease, .2s box-shadow ease; }
+    .gh:hover { transform: translateY(-1px); box-shadow: var(--shadow-1); }
+
+    main { position: relative; z-index: 1; }
+    .hero { min-height: 82vh; display: grid; place-items: center; padding: 64px 20px 20px; text-align: center; }
+    .content { max-width: 1100px; width: 100%; margin: 0 auto; }
+
+    .logo {
+      font-weight: 900; font-size: clamp(2.25rem, 5vw, 4rem);
+      background: linear-gradient(135deg, var(--p1), var(--p2), var(--p3));
+      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+      letter-spacing: -1.6px; margin-bottom: .6rem;
+      text-shadow: 0 8px 40px rgba(139,92,246,.25);
     }
-    /* --- hero --- */
-    .hero {
-      padding: 80px 0 48px 0;
-      text-align: center;
-      position: relative;
-      z-index: 2;
+    .tagline { font-size: clamp(1.05rem, 2.4vw, 1.35rem); color: var(--muted); margin-bottom: 2rem; }
+
+    /* ========= TABS ========= */
+    .tabs { display:flex; flex-wrap: wrap; justify-content:center; gap:.6rem; margin-bottom:1.2rem; }
+    .tab {
+      --ring: 0 0 0 0 rgba(139,92,246,0);
+      appearance:none; cursor:pointer; border-radius:999px; border:1px solid var(--stroke);
+      background: var(--glass);
+      padding:.7rem 1.1rem; color:var(--txt); font-weight:600; letter-spacing:.2px;
+      transition:.25s transform ease, .25s box-shadow ease, .25s border-color ease, .25s background ease;
+      outline: none; box-shadow: var(--ring);
     }
-    .hero-title {
-      font-family: 'Orbitron', 'Montserrat', sans-serif;
-      font-size: 2.8em;
-      color: #25ffe6;
-      text-shadow: 0 4px 30px #2bffa2bb, 0 0 15px #39fff990;
-      letter-spacing: 0.1em;
+    .tab:hover { transform: translateY(-1px); border-color: rgba(139,92,246,.45); }
+    .tab[aria-selected="true"] {
+      background: linear-gradient(135deg, color-mix(in oklab, var(--p1) 18%, transparent), color-mix(in oklab, var(--p2) 18%, transparent));
+      border-color: transparent; box-shadow: 0 8px 30px rgba(139,92,246,.28);
     }
-    .hero-desc {
-      color: #d3fdf7;
-      font-size: 1.24em;
-      max-width: 700px;
-      margin: 15px auto 22px auto;
-      line-height: 1.45;
-      text-shadow: 0 2px 11px #22ffd740;
+
+    /* ========= CARD ========= */
+    .card { background: linear-gradient(180deg, var(--glass-2), rgba(255,255,255,0.03));
+      border: 1px solid var(--stroke); border-radius: var(--radius);
+      padding: clamp(18px, 2.5vw, 28px); box-shadow: var(--shadow-2); min-height: 420px; }
+    .hidden { display:none !important; }
+
+    /* ========= FORMS / BUTTONS ========= */
+    .input-area { margin-bottom:1rem; }
+    textarea.gig-input { width:100%; min-height:120px; resize:vertical; padding:1.1rem 1rem;
+      border-radius:12px; border:1px solid rgba(139,92,246,.35); background: rgba(3,7,25,.55);
+      color:var(--txt); font-size:1rem; outline:none; transition:.25s border-color ease, .25s box-shadow ease; }
+    textarea.gig-input::placeholder { color: color-mix(in oklab, var(--txt) 55%, black 45%); opacity:.6; }
+    textarea.gig-input:focus { border-color: var(--p1); box-shadow: 0 0 0 4px color-mix(in oklab, var(--p1) 25%, transparent); }
+
+    .btn { display:inline-flex; align-items:center; gap:.6rem; border:none; cursor:pointer;
+      padding:.9rem 1.4rem; border-radius:999px; color:#fff; font-weight:700;
+      background: linear-gradient(135deg, var(--p1), var(--p2));
+      box-shadow: 0 10px 30px rgba(139,92,246,.35);
+      transition: .2s transform ease, .2s box-shadow ease, .2s filter ease; }
+    .btn:hover { transform: translateY(-1px); box-shadow: 0 14px 44px rgba(139,92,246,.48); }
+    .btn:active { transform: translateY(0); }
+    .btn.secondary { background: transparent; color: var(--txt); border:1px solid var(--stroke); box-shadow: none; }
+    .btn.success { background: linear-gradient(135deg, var(--p3), #2dd4bf); }
+    .btn.sol { background: linear-gradient(135deg, #9945FF, #14F195); position: relative; overflow: hidden; }
+    .btn.sol::after { content:""; position:absolute; inset:-40%;
+      background: conic-gradient(from 90deg, transparent, rgba(255,255,255,.6), transparent 30%);
+      animation: sweep 2.4s linear infinite; mix-blend-mode: overlay; pointer-events:none; }
+    @keyframes sweep { to { transform: rotate(360deg); } }
+
+    .loading { width: 18px; height: 18px; border-radius: 50%;
+      border: 3px solid rgba(255,255,255,.35); border-top-color:#fff; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) { .loading { animation: none; } }
+
+    /* ========= OUTPUT ========= */
+    .output { margin-top:1rem; padding:1rem; background: rgba(0,0,0,.35); border-radius:12px; border:1px solid var(--stroke); }
+    .contract-preview { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; font-size:.93rem; line-height:1.6; }
+    .section { margin:.8rem 0; padding:.8rem; border-left:3px solid var(--p1); background: color-mix(in oklab, var(--p1) 14%, transparent); border-radius:8px; }
+    .milestone { display:flex; justify-content:space-between; gap:.8rem; padding:.55rem .7rem; margin:.4rem 0; background: color-mix(in oklab, var(--p2) 14%, transparent); border-radius:7px; }
+
+    /* ========= INFO BLOCKS ========= */
+    .stack { display:grid; grid-template-columns: repeat(auto-fit, minmax(240px,1fr)); gap:1rem; margin-top:2rem; }
+    .tile { background: var(--glass); border:1px solid var(--stroke); border-radius:14px; padding:1.2rem; transition:.2s transform ease, .2s border-color ease; }
+    .tile:hover { transform: translateY(-2px); border-color: rgba(139,92,246,.45); }
+    .tile h3 { margin:.2rem 0 .4rem; font-size:1.1rem; }
+    .muted { color: var(--muted); }
+    footer { margin: 40px 0; text-align:center; color:var(--muted); }
+    @media (max-width: 768px) { .card { padding: 18px; } }
+
+    /* === WCSAP: Solana-inspired === */
+    .wcsap { --aurora-1:#9945FF; --aurora-2:#14F195; --aurora-3:#19FB9B; --rail:linear-gradient(90deg, rgba(20,241,149,.0), rgba(20,241,149,.35), rgba(153,69,255,.0)); }
+    .wcsap-head { position: relative; padding: 16px; border-radius: 14px; background: linear-gradient(135deg, rgba(153,69,255,.08), rgba(20,241,149,.06)); border: 1px solid var(--stroke); overflow: hidden; }
+    .wcsap-head::after { content:""; position:absolute; inset: -30%;
+      background: radial-gradient(600px 240px at 10% 10%, color-mix(in oklab, var(--aurora-1) 35%, transparent), transparent 60%),
+                  radial-gradient(600px 240px at 90% 30%, color-mix(in oklab, var(--aurora-2) 35%, transparent), transparent 60%);
+      filter: blur(40px); opacity:.7; pointer-events:none; }
+    .wcsap-rail { position: relative; margin: 18px 0 6px; height: 4px; border-radius: 999px; background: rgba(255,255,255,.08); overflow: visible; }
+    .wcsap-rail .glow { position: absolute; inset: 0; background: var(--rail); filter: blur(6px) saturate(120%);
+      transform-origin: left; transform: scaleX(0); transition: transform .7s cubic-bezier(.2,.8,.2,1); }
+    .wcsap-rail .dot { position: absolute; top: 50%; transform: translate(-50%,-50%); width: 12px; height: 12px; border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #fff, var(--aurora-2)); box-shadow: 0 0 18px rgba(153,69,255,.65); }
+    .wcsap-rail .dot:nth-child(2){ left: 25%; } .wcsap-rail .dot:nth-child(3){ left: 50%; } .wcsap-rail .dot:nth-child(4){ left: 75%; } .wcsap-rail .dot:nth-child(5){ left: 100%; }
+    .wcsap-steps { display:grid; grid-template-columns: repeat(auto-fit, minmax(250px,1fr)); gap: 14px; margin-top: 12px; }
+    .wcsap-step { position: relative; border-radius: 16px; background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border: 1px solid var(--stroke); padding: 16px 16px 14px; transition: .25s transform ease, .25s border-color ease, .25s filter ease; will-change: transform, filter; }
+    .wcsap-step:hover { transform: translateY(-2px); border-color: rgba(153,69,255,.45); filter: saturate(120%); }
+    .wcsap-step::before { content:""; position:absolute; inset:-1px; border-radius:inherit; z-index:0;
+      background: conic-gradient(from 0deg, var(--aurora-1), var(--aurora-2), var(--aurora-3), var(--aurora-1));
+      filter: blur(12px) opacity(.35); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor; mask-composite: exclude; padding: 1px; opacity: 0; transition: opacity .35s ease; }
+    .wcsap-step.is-active::before { opacity: 1; }
+    .wcsap-step h3 { margin: 4px 0 6px; font-size: 1.05rem; }
+    .wcsap-kicker { font-size: .82rem; color: var(--muted); letter-spacing:.2px; }
+
+    .wcsap-code, .wcsap-json { margin-top: 8px; border-radius: 12px; border: 1px solid var(--stroke); background: rgba(0,0,0,.45); padding: 10px 12px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .88rem; position: relative; overflow-x: hidden; }
+    .wcsap-json pre { white-space: pre-wrap; word-break: break-word; overflow-wrap: anywhere; margin: 0; }
+    .wcsap-code > div { white-space: pre-wrap; word-break: break-word; overflow-wrap: anywhere; }
+    .mono-wrap { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; word-break: break-all; overflow-wrap: anywhere; }
+    .wcsap-copy { position: sticky; top: 8px; right: 8px; float: right; margin-left: 8px; border:1px solid var(--stroke); border-radius: 999px; padding: 4px 10px; background: rgba(255,255,255,.06); cursor:pointer; font-size:.78rem; }
+    .wcsap-badge { display:inline-flex; align-items:center; gap:.4rem; padding: .35rem .6rem; border-radius: 999px; background: rgba(20,241,149,.12); border:1px solid rgba(20,241,149,.35); font-size:.78rem; margin-right: .5rem; }
+    .wcsap-badge.phantom { background: rgba(153,69,255,.12); border-color: rgba(153,69,255,.35); }
+    .typewriter { --caret: currentColor; display:inline-block; border-right: 2px solid var(--caret); white-space: nowrap; overflow: hidden; animation: caret 1s steps(1) infinite; }
+    @keyframes caret { 50% { border-color: transparent; } }
+    .nonce { display:inline-block; padding: .15rem .5rem; border-radius: 8px; background: rgba(153,69,255,.14); border:1px solid rgba(153,69,255,.35); font-family: ui-monospace, monospace; font-size:.82rem; }
+    .wave { height: 90px; border-radius: 10px; overflow: hidden; position: relative; background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)); border: 1px dashed rgba(255,255,255,.18); }
+
+    /* === Wallet Selector Modal === */
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(2,6,20,.6); backdrop-filter: blur(6px) saturate(120%); display:none; align-items:center; justify-content:center; z-index: 50; }
+    .modal-backdrop.show { display:flex; }
+    .modal { width:min(560px, 92vw); background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03)); border:1px solid var(--stroke); border-radius: 16px; box-shadow: var(--shadow-2); color:var(--txt); }
+    .modal header { position: relative; background: transparent; border: none; backdrop-filter: none; }
+    .modal .bar { display:flex; align-items:center; justify-content:space-between; padding: 14px 16px; border-bottom: 1px solid var(--stroke); }
+    .modal .close { appearance:none; border:none; background: transparent; color: var(--muted); font-size: 22px; line-height: 1; cursor: pointer; padding: 6px; border-radius: 8px; }
+    .modal .close:hover { background: rgba(255,255,255,.08); color: #fff; }
+    .providers { padding: 12px; display:grid; grid-template-columns: 1fr; gap: 10px; }
+    .provider { display:flex; align-items:center; gap: 12px; padding: 12px; border:1px solid var(--stroke); border-radius: 12px; background: rgba(0,0,0,.35); cursor:pointer; transition: .2s transform ease, .2s border-color ease, .2s background ease; }
+    .provider:hover, .provider:focus { transform: translateY(-1px); border-color: rgba(153,69,255,.45); outline: none; }
+    .provider .logo { width: 34px; height: 34px; border-radius: 8px; display:grid; place-items:center; font-size: 18px; }
+    .provider .name { font-weight: 700; }
+    .provider .hint { color: var(--muted); font-size: .85rem; }
+    .provider .badge { margin-left:auto; font-size:.78rem; padding:.25rem .45rem; border-radius:999px; border:1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.06); }
+    .handshake { padding: 12px 16px; border-top: 1px dashed rgba(255,255,255,.16); display:none; gap:10px; align-items:center; }
+    .handshake.show { display:flex; }
+    .progress { position: relative; height: 6px; flex:1; border-radius: 999px; background: rgba(255,255,255,.12); overflow: hidden; }
+    .progress > i { position:absolute; inset:0; background: linear-gradient(90deg, #14F195, #9945FF); transform-origin:left; transform: scaleX(0); transition: transform 1s ease; }
+
+    /* === API ENDPOINT CARDS (fixed “outside box” issue) === */
+    .endpoint-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+    .endpoint { background: var(--glass); border:1px solid var(--stroke); border-radius:14px; overflow:hidden; }
+    .endpoint-header { display:flex; align-items:center; gap:.6rem; padding: 10px 12px; border-bottom:1px solid var(--stroke); background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03)); }
+    .method-badge { display:inline-flex; align-items:center; font-weight:800; font-size:.78rem; padding:.25rem .55rem; border-radius:8px; border:1px solid rgba(255,255,255,.18); }
+    .method-POST { background: rgba(16,185,129,.18); }
+    .method-GET { background: rgba(59,130,246,.18); }
+    .path { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: #a5b4fc; word-break: break-all; overflow-wrap: anywhere; }
+    .codeblock { padding: 10px 12px; }
+    .codeblock pre { margin: 0; padding: 10px 12px; background: rgba(0,0,0,.45); border:1px solid var(--stroke); border-radius: 10px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:.9rem; white-space: pre-wrap; word-break: break-word; overflow-wrap: anywhere; }
+
+    @media (max-width: 520px) {
+      .wcsap-code, .wcsap-json { padding: 8px 10px; }
+      .wcsap-json pre, .wcsap-code { font-size: .82rem; }
+      .codeblock pre { font-size:.82rem; }
     }
-    .hero-btn {
-      font-family: 'Orbitron', 'Montserrat', sans-serif;
-      font-size: 1.14em; font-weight: bold;
-      background: rgba(34,255,166,0.9);
-      color: #181a2b;
-      border: none;
-      border-radius: 9px;
-      padding: 16px 38px;
-      box-shadow: 0 4px 20px #21fbb27c;
-      letter-spacing: 0.04em;
-      cursor: pointer;
-      transition: background 0.15s, color 0.2s, transform 0.15s;
-      margin-top: 22px;
-    }
-    .hero-btn:hover { background: #20145c; color: #2bffa2; transform: scale(1.07); }
-    /* --- glass cards --- */
-    .glass-section {
-      max-width: 970px; margin: 44px auto; padding: 38px 33px;
-      background: rgba(29,37,89,0.79);
-      border-radius: 19px;
-      box-shadow: 0 2px 38px #2bffa2a2, 0 7px 30px #24ffd633;
-      backdrop-filter: blur(6px);
-      position: relative;
-      z-index: 2;
-    }
-    .features-row {
-      display: flex; gap: 40px; flex-wrap: wrap; justify-content: center;
-      margin-top: 36px; margin-bottom: 20px;
-    }
-    .feature-card {
-      background: rgba(35,255,178,0.15);
-      border-radius: 11px;
-      border: 2px solid #21ffd698;
-      box-shadow: 0 2px 13px #22ffd610;
-      min-width: 210px; max-width: 320px;
-      padding: 25px 19px 18px 19px;
-      margin: 10px 0; color: #f3fdff;
-      text-align: left;
-      font-size: 1.04em;
-      position: relative;
-      transition: box-shadow 0.16s;
-    }
-    .feature-card:hover { box-shadow: 0 0 32px #42ffa266; }
-    .feature-card h3 { color: #2bffa2; margin:0 0 10px 0; font-family: 'Orbitron'; font-size: 1.12em;}
-    .feature-emoji {font-size: 1.38em; margin-right: 8px;}
-    /* Animated counters/roadmap */
-    .roadmap-row { margin: 32px 0 0 0; display: flex; gap: 28px; flex-wrap: wrap; }
-    .roadmap-step {
-      background: rgba(42,255,179,0.13); border-radius: 8px;
-      padding: 19px 14px; width: 240px; color: #61fdc5;
-      font-family: 'Orbitron';
-      box-shadow: 0 2px 10px #20ffc289;
-      position: relative; font-size: 1.08em;
-      border-left: 5px solid #2bffa2;
-      margin-bottom: 14px; margin-top: 11px;
-      overflow: hidden;
-    }
-    .progress-bar-outer {
-      width: 100%; height: 8px; background: #203549; border-radius: 7px; margin-top: 12px;
-      position: relative; overflow: hidden;
-    }
-    .progress-bar-inner {
-      height: 8px; background: linear-gradient(90deg,#2bffa2,#38e5fe); border-radius: 7px;
-      position: absolute; left: 0; top: 0;
-      width: 0; transition: width 1.2s cubic-bezier(.8,-0.9,.22,1.69);
-    }
-    /* Gamified profiles preview */
-    .profile-preview-card {
-      background: rgba(34,255,160,0.13);
-      border-radius: 15px; border: 1.5px solid #21ffd6aa;
-      box-shadow: 0 2px 10px #38ffa255;
-      padding: 22px 20px; max-width: 300px; margin: 30px auto 12px auto;
-      text-align: center;
-    }
-    .badge {display:inline-block; margin:6px 6px 2px 6px; padding:5px 9px;border-radius:12px;
-      background: linear-gradient(90deg, #22ffd6 0%, #5fd0fb 120%);
-      color:#161a3c; font-weight:600; font-size:0.97em;}
-    /* FAQ accordion */
-    .faq-card { margin: 45px auto 0 auto; max-width: 700px; }
-    .faq-section-title {font-family:'Orbitron'; color:#33fdef;font-size:1.31em; letter-spacing:0.01em;}
-    .faq-list {list-style:none; padding:0; margin:0;}
-    .faq-item {margin-bottom:14px; background:rgba(34,255,160,0.08); border-radius:8px; box-shadow:0 1px 4px #42ffa255;}
-    .faq-q {color:#2bffa2; font-weight:700; cursor:pointer; padding:13px; display:block;}
-    .faq-a {display:none;padding:13px;padding-top:2px;color:#c5ffe9;}
-    .faq-item.active .faq-a {display:block;}
-    /* Demo walkthrough */
-    .demo-btn {background:#2bffa2;color:#151927;font-family:'Orbitron';font-size:1em;font-weight:600;padding:9px 21px;border-radius:7px;box-shadow:0 2px 9px #20ffbe93;border:none;margin-top:16px;cursor:pointer;}
-    .demo-btn:hover{background:#17113a;color:#35ffe2;}
-    /* Team flipcards */
-    .team-row {display:flex;gap:34px;justify-content:center;flex-wrap:wrap;margin-top:28px;}
-    .team-card{background:rgba(45,255,160,0.13);border-radius:11px;padding:17px;width:205px;box-shadow:0 1px 8px #22ffa296;text-align:center;cursor:pointer;position:relative;transition:transform .17s;}
-    .team-card:hover{transform:scale(1.08);}
-    .team-front{min-height:57px;}
-    .team-back{display:none;position:absolute;z-index:3;left:0;top:0;background:rgba(22,47,74,0.99);width:100%;height:100%;border-radius:11px;}
-    .team-card.flipped .team-front{display:none;}
-    .team-card.flipped .team-back{display:block;}
-    .team-role{color:#a7ffe6;font-size:0.93em;}
-    /* Social proofs */
-    .social-proof-row{margin:30px auto 0 auto;max-width:670px;text-align:center;}
-    .sp-badge{display:inline-block;padding:10px 18px;border-radius:8px;background:rgba(34,255,160,0.18);color:#2bffa2;font-weight:700;margin:2px 10px 7px 0;font-size:0.98em;}
-    /* Video teaser */
-    .video-row{text-align:center;margin:40px auto 0 auto;}
-    .teaser-video{width:380px;max-width:97vw;border-radius:17px;box-shadow:0 2px 18px #20ffe093;}
-    /* Modal/join beta */
-    .modal-backdrop{display:none;position:fixed;left:0;top:0;width:100vw;height:100vh;background:#201a3aa6;z-index:99;}
-    .modal-content{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);background:#181a2b;border-radius:15px;padding:34px 28px;box-shadow:0 7px 45px #22ffd6a8;z-index:100;max-width:320px;width:95vw;text-align:center;color:#2bffa2;}
-    .modal-content h3{margin:0 0 14px 0;font-family:'Orbitron';font-size:1.25em;}
-    .modal-input{width:80%;font-size:1em;padding:8px 9px;border-radius:5px;border:1px solid #20ffc2;margin:12px 0 9px 0;}
-    .modal-btn{background:#2bffa2;color:#151927;font-family:'Orbitron';font-size:1em;font-weight:600;padding:8px 21px;border-radius:7px;box-shadow:0 2px 9px #20ffbe93;border:none;margin-top:5px;cursor:pointer;}
-    /* Wallet/testnet demo */
-    .wallet-demo-row{text-align:center;margin-top:33px;}
-    .wallet-demo-btn{background:#22ffd6;color:#161a2b;font-family:'Orbitron';font-size:1em;font-weight:600;padding:8px 18px;border-radius:7px;box-shadow:0 2px 9px #21ffbe53;border:none;}
-    .wallet-demo-btn:hover{background:#181a2b;color:#22ffd6;}
-    /* Responsive fix */
-    @media (max-width:900px){
-      .features-row, .roadmap-row, .team-row{flex-direction:column;align-items:center;}
-      .glass-section{padding:10px;}
+    @media (max-width: 360px) { .wcsap-json { overflow-x: auto; } }
+    @media (prefers-reduced-motion: reduce) {
+      .wcsap-rail .glow, .wcsap-step::before, .btn.sol::after { animation: none; transition: none; }
     }
   </style>
 </head>
 <body>
-  <!-- Animated Background (use a real JS particle lib for coolness, here simple circles) -->
-  <canvas class="particle-bg" id="particleBG"></canvas>
-  <script>
-  // Basic animated particles (replace with blockchain lines/cubes as needed)
-  const canvas = document.getElementById('particleBG');
-  if (canvas.getContext) {
-    const ctx = canvas.getContext('2d');
-    let w = window.innerWidth, h = window.innerHeight;
-    canvas.width = w; canvas.height = h;
-    let particles = Array.from({length:42},()=>({x:Math.random()*w,y:Math.random()*h,r:Math.random()*24+8,s:Math.random()*2+1}));
-    function drawParticles() {
-      ctx.clearRect(0,0,w,h);
-      for(const p of particles){
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, 2*Math.PI); ctx.fillStyle='rgba(34,255,166,0.12)';
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r*0.7, 0, 2*Math.PI); ctx.strokeStyle='rgba(42,255,200,0.2)'; ctx.stroke();
-        p.y+=(p.s); if(p.y-p.r>h) p.y=0-p.r;
-      }
-      requestAnimationFrame(drawParticles);
-    }
-    drawParticles();
+  <!-- Decorative scene -->
+  <div class="scene" aria-hidden="true">
+    <div class="grid"></div>
+    <div class="hex">
+      <svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+        <defs>
+          <pattern id="hex" width="40" height="34.64" patternUnits="userSpaceOnUse">
+            <g fill="none" stroke="var(--hex-stroke)" stroke-width="1">
+              <polygon points="20,0 40,10 40,24.64 20,34.64 0,24.64 0,10"/>
+            </g>
+          </pattern>
+          <pattern id="circuit" width="120" height="120" patternUnits="userSpaceOnUse">
+            <g fill="none" stroke="rgba(16,185,129,0.18)" stroke-width="1">
+              <path d="M0 20H40M40 20V0M60 120V60H120"/>
+              <circle cx="40" cy="20" r="2"/>
+              <circle cx="60" cy="60" r="2"/>
+            </g>
+          </pattern>
+          <filter id="glow"><feGaussianBlur stdDeviation="1.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#hex)"/>
+        <rect width="100%" height="100%" fill="url(#circuit)" filter="url(#glow)"/>
+      </svg>
+    </div>
+    <div class="scanline"></div>
+  </div>
+
+  <!-- Header -->
+  <header>
+    <div class="wrap">
+      <a class="brand" href="#" aria-label="GigChain Home">
+        <svg viewBox="0 0 100 100" aria-hidden="true">
+          <path d="M30 60c8 8 21 8 29 0l11-11c8-8 8-21 0-29-8-8-21-8-29 0l-7 7" fill="none" stroke="var(--p1)" stroke-width="10" stroke-linecap="round"/>
+          <path d="M70 40c-8-8-21-8-29 0L30 51c-8 8-8 21 0 29 8 8 21 8 29 0l7-7" fill="none" stroke="var(--p2)" stroke-width="10" stroke-linecap="round"/>
+        </svg>
+        <span>GigChain</span>
+      </a>
+      <div class="spacer"></div>
+      <a class="gh" href="https://github.com/Lento47/GigChain" target="_blank" rel="noopener">GitHub ↗</a>
+    </div>
+  </header>
+
+  <!-- Hero / App -->
+  <main class="hero">
+    <div class="content">
+      <h1 class="logo">GigChain</h1>
+      <p class="tagline">AI-Powered Web3 Contracts for the Gig Economy</p>
+
+      <!-- Tabs -->
+      <div class="tabs" role="tablist" aria-label="GigChain demos">
+        <button class="tab" role="tab" id="t-contract" aria-controls="p-contract" aria-selected="true" data-tab="contract">Contract Generator</button>
+        <button class="tab" role="tab" id="t-auth" aria-controls="p-auth" aria-selected="false" data-tab="auth">W-CSAP Auth Flow</button>
+        <button class="tab" role="tab" id="t-agents" aria-controls="p-agents" aria-selected="false" data-tab="agents">Agent Chaining</button>
+        <button class="tab" role="tab" id="t-api" aria-controls="p-api" aria-selected="false" data-tab="api">API Flow</button>
+        <button class="tab" role="tab" id="t-deploy" aria-controls="p-deploy" aria-selected="false" data-tab="deploy">Deployment</button>
+      </div>
+
+      <!-- Panels -->
+      <section class="card" id="panels">
+
+        <!-- Contract -->
+        <div id="p-contract" role="tabpanel" aria-labelledby="t-contract">
+          <div class="input-area">
+            <label for="gigInput" class="muted" style="display:block; margin:.25rem 0 .5rem;">Describe the gig:</label>
+            <textarea id="gigInput" class="gig-input" placeholder="Try it: 'Client offers $4K for NFT logo in 5 days. I want $5K.'"></textarea>
+          </div>
+          <button class="btn" id="generateBtn" type="button">
+            <span class="icon">⚡</span> Generate Smart Contract
+          </button>
+
+          <div class="output hidden" id="outputArea">
+            <div class="contract-preview" id="contractPreview"></div>
+          </div>
+        </div>
+
+        <!-- Auth (Solana-inspired W-CSAP) -->
+        <div id="p-auth" class="wcsap hidden" role="tabpanel" aria-labelledby="t-auth">
+          <div class="wcsap-head">
+            <h2 style="margin:0 0 6px">Wallet Challenge-Signature Authentication (W-CSAP)</h2>
+            <div class="wcsap-kicker">Solana-inspired flow: connect → challenge → sign → verify</div>
+
+            <div class="wcsap-rail" aria-hidden="true">
+              <div class="glow" id="wcsap-rail-glow"></div>
+              <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+            </div>
+
+            <div style="display:flex; gap:.5rem; flex-wrap:wrap">
+              <span class="wcsap-badge phantom">🟣 Phantom</span>
+              <span class="wcsap-badge">🟢 Solflare</span>
+              <span class="wcsap-badge">🟢 Backpack</span>
+            </div>
+          </div>
+
+          <div class="wcsap-steps">
+            <div class="wcsap-step" id="wcsap-1">
+              <h3>① Connect Wallet</h3>
+              <div class="wcsap-kicker">Client shares address with <code>/api/auth/challenge</code></div>
+              <div class="wcsap-code" style="margin-top:8px">
+                <button class="wcsap-copy" data-copy="0">Copy</button>
+                <div><strong>Address:</strong> <span id="addr" class="mono-wrap">0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0</span></div>
+              </div>
+              <div style="margin-top:10px; display:flex; gap:.5rem">
+                <button class="btn sol" id="btn-connect" type="button">Connect Wallet</button>
+                <button class="btn secondary" id="btn-randomize" type="button">Random address</button>
+              </div>
+            </div>
+
+            <div class="wcsap-step" id="wcsap-2">
+              <h3>② Receive Challenge</h3>
+              <div class="wcsap-kicker">Server returns challenge + nonce (5 min expiry)</div>
+
+              <!-- Readable / Raw toggle -->
+              <div style="display:flex; gap:.4rem; align-items:center; margin:6px 0;">
+                <button class="btn secondary" id="jsonReadableBtn" type="button" style="padding:.3rem .7rem; font-size:.8rem;">Readable</button>
+                <button class="btn secondary" id="jsonRawBtn" type="button" style="padding:.3rem .7rem; font-size:.8rem;">Raw JSON</button>
+              </div>
+
+              <!-- Readable view -->
+              <div class="wcsap-json" id="challengeReadable" style="display:none">
+                <div><strong>challenge:</strong> <span class="mono-wrap" id="rChallenge"></span></div>
+                <div><strong>nonce:</strong> <span class="mono-wrap" id="rNonce"></span></div>
+                <div><strong>expires_at:</strong> <span class="mono-wrap" id="rExpires"></span></div>
+              </div>
+
+              <!-- Raw JSON view -->
+              <div class="wcsap-json">
+                <button class="wcsap-copy" data-copy="1">Copy</button>
+<pre id="challengeBlock">{
+  "challenge": "<span id="challengeText" class="typewriter mono-wrap">GigChain-Auth-</span>",
+  "nonce": "<span id="nonce" class="nonce mono-wrap">00000000</span>",
+  "expires_at": "<span id="expiresAt" class="mono-wrap">2025-10-21T12:05:00Z</span>"
+}</pre>
+              </div>
+            </div>
+
+            <div class="wcsap-step" id="wcsap-3">
+              <h3>③ Sign Challenge</h3>
+              <div class="wcsap-kicker">Wallet signs the challenge with the private key</div>
+              <div class="wave" style="margin-top:8px"><canvas id="sigWave" width="800" height="90" aria-label="signature waveform"></canvas></div>
+              <div style="margin-top:10px">
+                <button class="btn sol" id="signBtn" type="button">Sign with Wallet</button>
+              </div>
+            </div>
+
+            <div class="wcsap-step" id="wcsap-4">
+              <h3>④ Verify & Issue Session</h3>
+              <div class="wcsap-kicker">Server verifies signature, returns tokens</div>
+              <div class="wcsap-json" style="margin-top:8px">
+                <button class="wcsap-copy" data-copy="2">Copy</button>
+<pre id="verifyBlock">{
+  "session_token": "eyJhbGc...",
+  "refresh_token": "dGhpc2lz...",
+  "expires_in": 86400
+}</pre>
+              </div>
+              <div style="margin-top:10px; font-size:.88rem" class="muted">✅ Verification passed • Proof of ownership established</div>
+            </div>
+          </div>
+
+          <div style="margin-top:14px; display:flex; gap:.6rem; flex-wrap:wrap">
+            <button class="btn sol" id="startAuthBtn" type="button">Run Auth Demo</button>
+            <button class="btn secondary" type="button" onclick="location.hash='#'">Docs</button>
+          </div>
+        </div>
+
+        <!-- Agents -->
+        <div id="p-agents" class="hidden" role="tabpanel" aria-labelledby="t-agents">
+          <h2 style="margin:0 0 1rem">AI Agent Chaining Process</h2>
+          <div class="stack" style="margin-top:.5rem">
+            <div class="tile agent" id="agent1"><div style="font-size:1.8rem">🤝</div><h3>Negotiation Agent</h3><p class="muted">Analyzes offers & generates counter-proposals</p></div>
+            <div class="tile agent" id="agent2"><div style="font-size:1.8rem">⚙️</div><h3>Generator Agent</h3><p class="muted">Creates contract with escrow clauses</p></div>
+            <div class="tile agent" id="agent3"><div style="font-size:1.8rem">⚖️</div><h3>Dispute Resolver</h3><p class="muted">Handles conflicts & resolutions</p></div>
+          </div>
+          <button class="btn" id="startAgentBtn" type="button" style="margin-top:1rem">Run Agent Chain</button>
+          <div id="agentOutput" class="output hidden" style="margin-top:1rem">
+            <div class="section"><strong>Agent Chain Complete!</strong><br/>Processed through all 3 agents in 2.3 seconds</div>
+          </div>
+        </div>
+
+        <!-- API (fixed boxes) -->
+        <div id="p-api" class="hidden" role="tabpanel" aria-labelledby="t-api">
+          <h2 style="margin:0 0 1rem">RESTful API Endpoints</h2>
+
+          <div class="endpoint-grid">
+
+            <div class="endpoint">
+              <div class="endpoint-header">
+                <span class="method-badge method-POST">POST</span>
+                <code class="path">/api/full_flow</code>
+              </div>
+              <div class="codeblock">
+<pre>// Request
+{
+  "text": "Client offers $4K for logo in 5 days"
+}
+
+// Response
+{
+  "contract_id": "gig_2025-10-21",
+  "escrow_ready": true,
+  "counter_offer": 4500.0
+}</pre>
+              </div>
+            </div>
+
+            <div class="endpoint">
+              <div class="endpoint-header">
+                <span class="method-badge method-POST">POST</span>
+                <code class="path">/api/contract</code>
+              </div>
+              <div class="codeblock">
+<pre>// Generate contract from text
+{
+  "text": "Simple task for $100"
+}</pre>
+              </div>
+            </div>
+
+            <div class="endpoint">
+              <div class="endpoint-header">
+                <span class="method-badge method-GET">GET</span>
+                <code class="path">/health</code>
+              </div>
+              <div class="codeblock">
+<pre>// Health check endpoint
+{
+  "status": "healthy",
+  "version": "1.0.0"
+}</pre>
+              </div>
+            </div>
+
+            <div class="endpoint">
+              <div class="endpoint-header">
+                <span class="method-badge method-POST">POST</span>
+                <code class="path">/api/auth/challenge</code>
+              </div>
+              <div class="codeblock">
+<pre>// W-CSAP authentication
+{
+  "wallet_address": "0x..."
+}</pre>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Deploy -->
+        <div id="p-deploy" class="hidden" role="tabpanel" aria-labelledby="t-deploy">
+          <h2 style="margin:0 0 1rem">Production Deployment Flow</h2>
+          <div class="stack">
+            <div class="tile"><div style="font-size:2rem">🐳</div><h3>Docker Build</h3><p class="muted">Containerized with Docker Compose</p></div>
+            <div class="tile"><div style="font-size:2rem">🔒</div><h3>Nginx Proxy</h3><p class="muted">Reverse proxy with SSL</p></div>
+            <div class="tile"><div style="font-size:2rem">⚡</div><h3>Rate Limiting</h3><p class="muted">10 req/s API protection</p></div>
+            <div class="tile"><div style="font-size:2rem">🛡️</div><h3>Security Headers</h3><p class="muted">HSTS, CSP, XSS protection</p></div>
+            <div class="tile"><div style="font-size:2rem">📊</div><h3>Health Checks</h3><p class="muted">Auto-restart & monitoring</p></div>
+            <div class="tile"><div style="font-size:2rem">🚀</div><h3>VPS Deploy</h3><p class="muted">DigitalOcean ready</p></div>
+          </div>
+          <pre class="output" style="margin-top:1rem"><code># Quick deployment commands
+./deploy.sh production
+
+# Or with PowerShell
+.\deploy.ps1 production
+
+# Health check
+curl https://yourdomain.com/health</code></pre>
+        </div>
+      </section>
+
+      <!-- Features -->
+      <section style="margin-top: 28px;">
+        <div class="stack">
+          <div class="tile"><div style="font-size:1.8rem">🤖</div><h3>AI Agent Chaining</h3><p class="muted">Negotiation, generation & dispute resolution with multiple agents</p></div>
+          <div class="tile"><div style="font-size:1.8rem">🔗</div><h3>Web3 Integration</h3><p class="muted">Deploy-ready contracts on Polygon with USDC escrow</p></div>
+          <div class="tile"><div style="font-size:1.8rem">⚡</div><h3>FastAPI Backend</h3><p class="muted">High-performance API with automatic documentation</p></div>
+          <div class="tile"><div style="font-size:1.8rem">🔒</div><h3>Production Ready</h3><p class="muted">Security headers, rate limiting & W-CSAP auth</p></div>
+        </div>
+
+        <div style="margin-top: 16px; display:flex; flex-wrap:wrap; gap:.6rem; justify-content:center">
+          <a class="btn secondary" href="https://github.com/Lento47/GigChain">View on GitHub</a>
+          <a class="btn secondary" href="https://github.com/Lento47/GigChain#-quick-start">Quick Start</a>
+          <a class="btn secondary" href="https://github.com/Lento47/GigChain/tree/main/docs">Documentation</a>
+        </div>
+      </section>
+
+      <footer>© <span id="year"></span> GigChain. Built for creators & clients.</footer>
+    </div>
+  </main>
+
+  <!-- Wallet Selector Modal -->
+  <div class="modal-backdrop" id="walletModal" aria-hidden="true" aria-labelledby="walletTitle" role="dialog">
+    <div class="modal" role="document">
+      <header>
+        <div class="bar">
+          <h3 id="walletTitle" style="margin:0">Select a Wallet</h3>
+          <button class="close" id="walletClose" aria-label="Close">✕</button>
+        </div>
+      </header>
+      <div class="providers">
+        <button class="provider" data-provider="phantom"><div class="logo" style="background: radial-gradient(circle at 30% 30%, #fff, #9945FF);">🟣</div><div><div class="name">Phantom</div><div class="hint">Recommended • Solana</div></div><span class="badge">Installed</span></button>
+        <button class="provider" data-provider="solflare"><div class="logo" style="background: radial-gradient(circle at 30% 30%, #fff, #14F195);">🟢</div><div><div class="name">Solflare</div><div class="hint">Solana-first wallet</div></div><span class="badge">Available</span></button>
+        <button class="provider" data-provider="backpack"><div class="logo" style="background: radial-gradient(circle at 30% 30%, #fff, #19FB9B);">🟢</div><div><div class="name">Backpack</div><div class="hint">xNFT compatible</div></div><span class="badge">Available</span></button>
+        <button class="provider" data-provider="glow"><div class="logo" style="background: radial-gradient(circle at 30% 30%, #fff, #06b6d4);">🔵</div><div><div class="name">Glow</div><div class="hint">Simple & fast</div></div><span class="badge">Available</span></button>
+        <button class="provider" data-provider="ledger"><div class="logo" style="background: radial-gradient(circle at 30% 30%, #fff, #0ea5e9);">💠</div><div><div class="name">Ledger</div><div class="hint">Hardware wallet</div></div><span class="badge">USB</span></button>
+      </div>
+      <div class="handshake" id="handshake">
+        <div class="loading" aria-hidden="true"></div>
+        <div class="muted" id="handshakeText">Requesting connection…</div>
+        <div class="progress"><i id="handshakeBar"></i></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "GigChain",
+    "applicationCategory": "Web3ContractTool",
+    "operatingSystem": "Web",
+    "description": "Generate AI-powered Web3 gig contracts with escrow and wallet authentication.",
+    "url": "https://lento47.github.io/GigChain",
+    "creator": { "@type": "Organization", "name": "GigChain" }
   }
   </script>
 
-  <!-- Hero Section -->
-  <div class="hero">
-    <div class="hero-title">GigChainWebLite</div>
-    <div class="hero-desc">
-      Blockchain-powered gigs. Instant payments. AI contracts. Join the <b>future of work</b> built by <span style="color:#2bffa2;font-weight:700;">Lejzer Traña</span>.<br>
-      <span style="color:#9fffcf">Open-source intro at <a href="https://github.com/Lento47/GigChain" target="_blank" style="color:#2bffa2">GigChain</a></span>.
-    </div>
-    <button class="hero-btn" id="joinBetaBtn">Join Beta</button>
-  </div>
-
-  <!-- Modal for Join Beta -->
-  <div class="modal-backdrop" id="modalBackdrop"></div>
-  <div class="modal-content" id="modalBox" style="display:none;">
-    <h3>Get Early Access</h3>
-    <input type="email" class="modal-input" placeholder="Your email (demo)" id="joinEmail"/>
-    <button class="modal-btn" onclick="document.getElementById('modalBox').style.display='none';document.getElementById('modalBackdrop').style.display='none';alert('Demo: Thanks!')">Submit</button>
-    <div style="color:#8fffd7;margin-top:7px;font-size:0.96em;">You’ll get notified when alpha launches.</div>
-  </div>
   <script>
-    document.getElementById('joinBetaBtn').onclick=function(){
-      document.getElementById('modalBox').style.display='block';
-      document.getElementById('modalBackdrop').style.display='block';
+    /* ===== Tabs (ARIA) ===== */
+    const tabs = [...document.querySelectorAll('.tab')];
+    const panels = {
+      contract: document.getElementById('p-contract'),
+      auth: document.getElementById('p-auth'),
+      agents: document.getElementById('p-agents'),
+      api: document.getElementById('p-api'),
+      deploy: document.getElementById('p-deploy'),
     };
-    document.getElementById('modalBackdrop').onclick=function(){
-      document.getElementById('modalBox').style.display='none';
-      document.getElementById('modalBackdrop').style.display='none';
-    };
-  </script>
-
-  <!-- Glass Features Section -->
-  <div class="glass-section">
-    <div class="features-row">
-      <div class="feature-card">
-        <h3><span class="feature-emoji">🤖</span>AI Contracts & Agents</h3>
-        <div>Frictionless contract generation, negotiation, and quality with advanced agents.</div>
-      </div>
-      <div class="feature-card">
-        <h3><span class="feature-emoji">🔐</span>Web3 Wallet Auth</h3>
-        <div>Instant login, Proof of Identity, testnet trials—no passwords ever.</div>
-      </div>
-      <div class="feature-card">
-        <h3><span class="feature-emoji">💼</span>Marketplace & Payments</h3>
-        <div>Escrow, milestones, XP, badges, NFT rewards and more—live and on-chain.</div>
-      </div>
-      <div class="feature-card">
-        <h3><span class="feature-emoji">🎮</span>Gamified Profiles</h3>
-        <div>Earn reputation, level up, customize badges, and preview your blockchain score.</div>
-      </div>
-    </div>
-    <button class="demo-btn" onclick="alert('Demo: In full app, you could try contract creation!')">Try Live Demo (Preview)</button>
-  </div>
-
-  <!-- Animated Roadmap -->
-  <div class="glass-section">
-    <div style="font-family:'Orbitron';font-size:1.21em;color:#2bffa2;margin-bottom:13px;">Roadmap Progress &#128200;</div>
-    <div class="roadmap-row">
-      <div class="roadmap-step">
-        <b>Q4 2025</b> MVP Launched
-        <div class="progress-bar-outer"><div class="progress-bar-inner" style="width:90%;"></div></div>
-      </div>
-      <div class="roadmap-step">
-        <b>Q1 2026</b> Mobile App (Alpha)
-        <div class="progress-bar-outer"><div class="progress-bar-inner" style="width:60%;"></div></div>
-      </div>
-      <div class="roadmap-step">
-        <b>Q2 2026</b> NFT Reputation & Layer-2
-        <div class="progress-bar-outer"><div class="progress-bar-inner" style="width:32%;"></div></div>
-      </div>
-      <div class="roadmap-step">
-        <b>Q3 2026</b> Global Expansion
-        <div class="progress-bar-outer"><div class="progress-bar-inner" style="width:10%;"></div></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Gamified Profile Preview -->
-  <div class="profile-preview-card">
-    <div style="font-family:'Orbitron';color:#2bffa2;font-size:1.09em;">Your On-Chain Profile</div>
-    <div style="margin-top:8px;font-size:1.07em;color:#99faee;">Level: <b>VIP 7</b> <span style="font-size:1.21em;">🏆</span></div>
-    <div>XP: 3,120</div>
-    <div style="margin:12px 0 10px 0;">
-      <span class="badge">Smart Contract Pro</span>
-      <span class="badge">GigChain Verified</span>
-      <span class="badge">Dispute Resolver</span>
-      <span class="badge">100+ contracts</span>
-    </div>
-    <button class="demo-btn" onclick="alert('Demo: In full app, you could customize your profile!')">Customize Profile (Demo)</button>
-  </div>
-
-  <!-- FAQ Accordion -->
-  <div class="faq-card">
-    <div class="faq-section-title">FAQ</div>
-    <ul class="faq-list">
-      <li class="faq-item">
-        <span class="faq-q">What is GigChain?</span>
-        <span class="faq-a">A decentralized, AI-powered gig marketplace that leverages smart contracts on blockchain for security, reputation, and instant payments.</span>
-      </li>
-      <li class="faq-item">
-        <span class="faq-q">Can I really join with just a wallet?</span>
-        <span class="faq-a">Yes! Just connect a testnet or mainnet wallet, no passwords required, and your reputation is stored on-chain.</span>
-      </li>
-      <li class="faq-item">
-        <span class="faq-q">How do contracts work?</span>
-        <span class="faq-a">All gigs post smart contracts (escrow/XP/NFT rewards) with milestones, dispute resolution, and automated payment flow.</span>
-      </li>
-      <li class="faq-item">
-        <span class="faq-q">Where do I report issues or contribute?</span>
-        <span class="faq-a">On our Platform GigChain, when published, we will create a community.</span>
-      </li>
-    </ul>
-  </div>
-  <script>
-  // FAQ accordion
-  document.querySelectorAll('.faq-q').forEach(el=>{
-    el.onclick=function(){
-      let item=this.parentNode; item.classList.toggle('active');
+    function selectTab(name) {
+      tabs.forEach(t => {
+        const active = t.dataset.tab === name;
+        t.setAttribute('aria-selected', active ? 'true' : 'false');
+        t.tabIndex = active ? 0 : -1;
+      });
+      Object.entries(panels).forEach(([key, el]) => {
+        el.classList.toggle('hidden', key !== name);
+      });
     }
-  });
+    tabs.forEach(t => t.addEventListener('click', () => selectTab(t.dataset.tab)));
+    document.addEventListener('keydown', (e) => {
+      const i = tabs.findIndex(t => t.getAttribute('aria-selected') === 'true');
+      if (e.key === 'ArrowRight') { const n=(i+1)%tabs.length; tabs[n].focus(); tabs[n].click(); }
+      if (e.key === 'ArrowLeft')  { const n=(i-1+tabs.length)%tabs.length; tabs[n].focus(); tabs[n].click(); }
+    });
+    selectTab('contract');
+
+    /* ===== Contract Generator (mock) ===== */
+    const generateBtn = document.getElementById('generateBtn');
+    const gigInput = document.getElementById('gigInput');
+    const outputArea = document.getElementById('outputArea');
+    const contractPreview = document.getElementById('contractPreview');
+
+    function particleBurst(el) {
+      const rect = el.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2, cy = rect.top + rect.height / 2;
+      for (let i=0;i<6;i++){
+        const p=document.createElement('div');
+        p.style.cssText=`position:fixed;left:${cx}px;top:${cy}px;width:6px;height:6px;border-radius:50%;background:var(--p1);pointer-events:none;z-index:9999;opacity:1`;
+        document.body.appendChild(p);
+        const angle = (Math.PI*2*i)/6, v = 2.4;
+        let x=cx, y=cy;
+        const step=()=>{ x+=Math.cos(angle)*v; y+=Math.sin(angle)*v; p.style.left=x+'px'; p.style.top=y+'px'; p.style.opacity = (+p.style.opacity - 0.02).toString(); if (+p.style.opacity>0) requestAnimationFrame(step); else p.remove(); };
+        step();
+      }
+    }
+
+    generateBtn.addEventListener('click', () => {
+      const input = gigInput.value.trim();
+      if (!input) {
+        gigInput.placeholder = 'Please enter a gig description first!';
+        gigInput.style.borderColor = getComputedStyle(document.documentElement).getPropertyValue('--warn');
+        setTimeout(() => {
+          gigInput.placeholder = "Try it: 'Client offers $4K for NFT logo in 5 days. I want $5K.'";
+          gigInput.style.borderColor = 'rgba(139, 92, 246, 0.35)';
+        }, 1600);
+        return;
+      }
+      particleBurst(generateBtn);
+      generateBtn.innerHTML = '<span class="loading" aria-hidden="true"></span> Generating…';
+      generateBtn.disabled = true;
+
+      setTimeout(() => {
+        const mock = {
+          contract_id: `gig_${new Date().toISOString().split('T')[0]}`,
+          counter_offer: 4500,
+          milestones: [
+            { desc: 'Initial design concepts', amount: 1350, deadline: '5 days' },
+            { desc: 'First revision', amount: 1350, deadline: '10 days' },
+            { desc: 'Final delivery & rights transfer', amount: 1800, deadline: '15 days' }
+          ],
+          escrow_address: '0x' + Math.random().toString(16).slice(2).padEnd(40,'0'),
+          network: 'Polygon',
+          token: 'USDC'
+        };
+        contractPreview.innerHTML = `
+          <div class="section"><strong>🆔 Contract ID:</strong> ${mock.contract_id}</div>
+          <div class="section"><strong>💰 Counter Offer:</strong> ${mock.counter_offer} USDC</div>
+          <div class="section"><strong>📋 Milestones:</strong>
+            ${mock.milestones.map(m => `
+              <div class="milestone">
+                <span>${m.desc}</span>
+                <span><strong>${m.amount}</strong> · ${m.deadline}</span>
+              </div>
+            `).join('')}
+          </div>
+          <div class="section"><strong>🔗 Escrow Address:</strong><br>
+            <code style="font-size:.9rem;word-break:break-all">${mock.escrow_address}</code>
+          </div>
+          <div class="section"><strong>🌐 Network:</strong> ${mock.network} · <strong>Token:</strong> ${mock.token}</div>
+          <div class="muted" style="margin-top:.8rem">⚠️ AI-generated draft—consult a legal expert before production use.</div>
+        `;
+        outputArea.classList.remove('hidden');
+        generateBtn.textContent = 'Generate Smart Contract';
+        generateBtn.disabled = false;
+      }, 900);
+    });
+
+    if (!gigInput.value) setTimeout(() => { gigInput.value = "Client offers $4K for NFT logo in 5 days. I want $5K."; }, 700);
+
+    /* ===== Agents (simple animation) ===== */
+    const startAgentBtn = document.getElementById('startAgentBtn');
+    const agentOutput = document.getElementById('agentOutput');
+    startAgentBtn?.addEventListener('click', () => {
+      particleBurst(startAgentBtn);
+      const agents = [ 'agent1','agent2','agent3' ].map(id => document.getElementById(id));
+      agents.forEach(a => a.style.outline = 'none');
+      agentOutput.classList.add('hidden');
+      startAgentBtn.innerHTML = '<span class="loading" aria-hidden="true"></span> Processing…';
+      startAgentBtn.disabled = true;
+
+      let idx=0;
+      const mark = () => {
+        if (idx>0) agents[idx-1].style.outline = 'none';
+        if (idx<agents.length) {
+          agents[idx].style.outline = '2px solid color-mix(in oklab, var(--p2) 55%, transparent)';
+          idx++; setTimeout(mark, 600);
+        } else {
+          agents.at(-1).style.outline = 'none';
+          agentOutput.classList.remove('hidden');
+          startAgentBtn.textContent = 'Run Agent Chain';
+          startAgentBtn.disabled = false;
+        }
+      };
+      mark();
+    });
+
+    /* Footer year */
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    /* Respect reduced motion */
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      document.querySelectorAll('.scanline, .grid').forEach(el => el.style.animation = 'none');
+    }
+
+    /* ===== WCSAP Animations (Solana-style) ===== */
+    const railGlow = document.getElementById('wcsap-rail-glow');
+    const steps = ['wcsap-1','wcsap-2','wcsap-3','wcsap-4'].map(id=>document.getElementById(id));
+    function setActive(idx){
+      steps.forEach((el,i)=>el.classList.toggle('is-active', i<=idx));
+      const pct = [0, 25, 50, 75, 100][idx+1] || 0;
+      railGlow.style.transform = `scaleX(${pct/100})`;
+    }
+    // tilt hover
+    steps.forEach(card=>{
+      card.addEventListener('mousemove', (e)=>{
+        const r = card.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width - .5;
+        const y = (e.clientY - r.top) / r.height - .5;
+        card.style.transform = `rotateX(${(-y*4)}deg) rotateY(${(x*6)}deg) translateY(-2px)`;
+      });
+      card.addEventListener('mouseleave', ()=> card.style.transform='');
+    });
+
+    // Randomize address (keeps current address format)
+    const addrEl = document.getElementById('addr');
+    document.getElementById('btn-randomize')?.addEventListener('click', ()=>{
+      addrEl.textContent = makeRandomAddress(isSolanaConnected ? 'sol' : 'evm');
+    });
+
+    // Typewriter challenge + live nonce
+    const challengeEl = document.getElementById('challengeText');
+    const nonceEl = document.getElementById('nonce');
+    let typeTimer, nonceTimer;
+    function playChallenge(){
+      const seed = Math.random().toString(16).slice(2,10);
+      const target = 'GigChain-Auth-' + seed;
+      challengeEl.textContent = '';
+      const chars = [...target];
+      let i=0; clearInterval(typeTimer);
+      typeTimer = setInterval(()=>{
+        challengeEl.textContent += chars[i++] || '';
+        if (i>chars.length){ clearInterval(typeTimer); }
+      }, 45);
+      clearInterval(nonceTimer);
+      nonceTimer = setInterval(()=>{
+        nonceEl.textContent = [...Array(8)].map(()=>Math.floor(Math.random()*16).toString(16)).join('');
+      }, 80);
+    }
+
+    // Signature waveform
+    const canvas = document.getElementById('sigWave');
+    const ctx = canvas?.getContext('2d');
+    let waveT = 0, waveRAF;
+    function drawWave(){
+      if(!ctx) return;
+      const {width:w, height:h} = canvas;
+      ctx.clearRect(0,0,w,h);
+      ctx.lineWidth = 2;
+      const grd = ctx.createLinearGradient(0,0,w,0);
+      grd.addColorStop(0,'#14F195'); grd.addColorStop(1,'#9945FF');
+      ctx.strokeStyle = grd;
+      ctx.beginPath();
+      const amp = 26, base = h/2;
+      for(let x=0; x<w; x++){
+        const y = base + Math.sin((x+waveT)*0.05)*amp*Math.sin((x)*0.008);
+        ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      waveT+=2;
+      waveRAF = requestAnimationFrame(drawWave);
+    }
+    function stopWave(){ cancelAnimationFrame(waveRAF); }
+
+    // Copy buttons
+    document.querySelectorAll('.wcsap-copy').forEach((btn,i)=>{
+      btn.addEventListener('click', ()=>{
+        const text = i===0 ? addrEl.textContent
+                   : i===1 ? document.getElementById('challengeBlock').innerText
+                   : document.getElementById('verifyBlock').innerText;
+        navigator.clipboard.writeText(text||'');
+        btn.textContent = 'Copied!'; setTimeout(()=>btn.textContent='Copy', 900);
+      });
+    });
+
+    // Readable vs Raw toggle
+    const readableBox = document.getElementById('challengeReadable');
+    const rawPre = document.getElementById('challengeBlock');
+    const btnReadable = document.getElementById('jsonReadableBtn');
+    const btnRaw = document.getElementById('jsonRawBtn');
+    const rChallenge = document.getElementById('rChallenge');
+    const rNonce = document.getElementById('rNonce');
+    const rExpires = document.getElementById('rExpires');
+
+    function syncReadable(){
+      rChallenge.textContent = document.getElementById('challengeText')?.textContent || '';
+      rNonce.textContent = document.getElementById('nonce')?.textContent || '';
+      rExpires.textContent = document.getElementById('expiresAt')?.textContent || '';
+    }
+    btnReadable?.addEventListener('click', ()=>{
+      syncReadable();
+      readableBox.style.display = '';
+      rawPre.parentElement.style.display = 'none';
+    });
+    btnRaw?.addEventListener('click', ()=>{
+      rawPre.parentElement.style.display = '';
+      readableBox.style.display = 'none';
+    });
+    syncReadable();
+
+    /* ===== Wallet Selector Modal ===== */
+    const connectBtn = document.getElementById('btn-connect');
+    const modal = document.getElementById('walletModal');
+    const closeBtn = document.getElementById('walletClose');
+    const providers = [...document.querySelectorAll('.provider')];
+    const handshake = document.getElementById('handshake');
+    const handshakeText = document.getElementById('handshakeText');
+    const handshakeBar = document.getElementById('handshakeBar');
+
+    let lastFocused; // for focus return
+    let isSolanaConnected = true; // default after connect (updated per provider)
+
+    function openModal(){
+      lastFocused = document.activeElement;
+      modal.classList.add('show');
+      modal.setAttribute('aria-hidden', 'false');
+      providers[0].focus();
+      // reset handshake UI
+      handshake.classList.remove('show');
+      handshakeText.textContent = 'Requesting connection…';
+      handshakeBar.style.transform = 'scaleX(0)';
+    }
+    function closeModal(){
+      modal.classList.remove('show');
+      modal.setAttribute('aria-hidden', 'true');
+      lastFocused && lastFocused.focus();
+    }
+    connectBtn?.addEventListener('click', openModal);
+    closeBtn?.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e)=>{ if (e.target === modal) closeModal(); });
+    document.addEventListener('keydown', (e)=>{ if (e.key === 'Escape' && modal.classList.contains('show')) closeModal(); });
+
+    // Base58 (Solana-like) generator and EVM hex generator
+    const B58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+    function randomBase58(len=44){
+      // realistic-looking length, excludes visually ambiguous chars
+      let out = '';
+      const arr = crypto.getRandomValues(new Uint8Array(len));
+      for (let i=0; i<arr.length; i++) out += B58[arr[i] % B58.length];
+      return out;
+    }
+    function randomHex40(){
+      return '0x' + Array.from(crypto.getRandomValues(new Uint8Array(20))).map(b=>b.toString(16).padStart(2,'0')).join('');
+    }
+    function makeRandomAddress(kind){
+      return kind === 'sol' ? randomBase58(44) : randomHex40();
+    }
+
+    function simulateHandshake(provider){
+      // Treat all listed wallets as Solana for this demo (show base58)
+      isSolanaConnected = ['phantom','solflare','backpack','glow','ledger'].includes(provider);
+      handshake.classList.add('show');
+      handshakeText.textContent = `Connecting to ${provider.charAt(0).toUpperCase()+provider.slice(1)}…`;
+      handshakeBar.style.transform = 'scaleX(0)';
+      setTimeout(()=>{ handshakeText.textContent = 'Authorizing…'; handshakeBar.style.transform = 'scaleX(.5)'; }, 500);
+      setTimeout(()=>{ handshakeText.textContent = 'Fetching account…'; handshakeBar.style.transform = 'scaleX(.85)'; }, 1000);
+
+      setTimeout(()=>{
+        handshakeBar.style.transform = 'scaleX(1)';
+        // set address + proceed to step 2
+        addrEl.textContent = makeRandomAddress(isSolanaConnected ? 'sol' : 'evm');
+        connectBtn.textContent = 'Connected ✓';
+        closeModal();
+        setActive(1);
+        playChallenge();
+      }, 1500);
+    }
+
+    providers.forEach(btn=>{
+      btn.addEventListener('click', ()=> simulateHandshake(btn.dataset.provider));
+      btn.addEventListener('keydown', (e)=>{
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); simulateHandshake(btn.dataset.provider); }
+      });
+    });
+
+    // Sign button
+    const signBtn = document.getElementById('signBtn');
+    signBtn?.addEventListener('click', ()=>{
+      drawWave();
+      signBtn.innerHTML = '<span class="loading" aria-hidden="true"></span> Signing…';
+      signBtn.disabled = true;
+      setActive(2);
+      setTimeout(()=>{
+        stopWave();
+        signBtn.textContent = '✓ Signature Verified';
+        signBtn.disabled = false;
+        setActive(3);
+      }, 1100);
+    });
+
+    // Autoplay demo: opens modal, picks Phantom automatically, then signs
+    const runBtn = document.getElementById('startAuthBtn');
+    runBtn?.addEventListener('click', ()=>{
+      setActive(-1);
+      openModal();
+      setTimeout(()=>{
+        simulateHandshake('phantom');
+        setTimeout(()=>{ signBtn.click(); }, 1200);
+      }, 400);
+    });
+
+    // init
+    setActive(0);
+    playChallenge();
   </script>
-
-  <!-- Team Flip Cards -->
-  <div class="glass-section">
-    <div style="font-family:'Orbitron';color:#2bffa2;font-size:1.21em;margin-bottom:13px;">Team</div>
-    <div class="team-row">
-      <div class="team-card" onclick="this.classList.toggle('flipped')">
-        <div class="team-front">
-          <div style="font-weight:700;">Lejzer Traña</div>
-          <div class="team-role">Founder</div>
-        </div>
-        <div class="team-back">
-          <div style="margin-top:19px;">Built Web3 contracts, AI agents, and the core vision for GigChain. Crypto for all!</div>
-        </div>
-      </div>
-      <div class="team-card" onclick="this.classList.toggle('flipped')">
-        <div class="team-front">
-          <div style="font-weight:700;">Open for Builders</div>
-          <div class="team-role">Contributor</div>
-        </div>
-        <div class="team-back">
-          <div style="margin-top:19px;">Want to join? Fork <a href="https://github.com/Lento47/GigChain" style="color:#2bffa2;">GigChain</a> and open a PR!</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Social Proof -->
-  <div class="social-proof-row">
-    <div class="sp-badge">As seen on Polygon Testnet</div>
-    <div class="sp-badge">Powered by OpenAI Agents</div>
-    <div class="sp-badge">Backed by FastAPI & Solidity</div>
-    <div class="sp-badge">Community Driven</div>
-  </div>
-
-  <!-- Video Teaser -->
-  <div class="video-row">
-    <video class="teaser-video" controls autoplay loop muted>
-      <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
-      <!-- Replace with real demo when possible -->
-      Sorry, your browser does not support embedded videos.
-    </video>
-    <div style="color:#2bffa2;margin-top:8px;">See how a gig/contract process works!</div>
-  </div>
-
-  <!-- Wallet Demo/Connection -->
-  <div class="wallet-demo-row">
-    <button class="wallet-demo-btn" onclick="alert('Demo: Wallet connected! XP/NFTs awarded (testnet only).')">Connect Testnet Wallet (Demo)</button>
-  </div>
-
-  <footer>
-    &copy; 2025 GigChainWebLite — For GigChain and the future.<br>
-    <span style="font-size:0.92em;color:#51fcf7;">Blockchain. AI. Work for everyone.</span>
-  </footer>
 </body>
 </html>
