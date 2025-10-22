@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>GigChain.io — Blockchain-Powered Gig Economy</title>
+  <!-- Fonts: Futuristic & readable -->
+  <link href="https://fonts.googleapis.com/css?family=Orbitron:700|Montserrat:400,600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0; padding: 0;
+      font-family: 'Montserrat', Arial, sans-serif;
+      background: radial-gradient(ellipse at top left, #282954 50%, #22ffd6 180%);
+      color: #f0fff7;
+      min-height: 100vh;
+    }
+    .hero {
+      padding: 72px 0 24px 0;
+      background: linear-gradient(135deg, #121425 70%, #3cffb7 150%);
+      box-shadow: 0 12px 40px 0 #24d9b044;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-title {
+      font-family: 'Orbitron', 'Montserrat', sans-serif;
+      font-size: 2.9em;
+      color: #24ffd6;
+      letter-spacing: 0.13em;
+      text-shadow: 0 4px 28px #24d9b055, 0 0 8px #44f6e0;
+    }
+    .hero-highlight {
+      font-weight: 700;
+      color: #2bffa2;
+      background: -webkit-linear-gradient(60deg, #39fff9, #b2fb53);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      font-size: 1.15em;
+    }
+    .hero-desc {
+      font-size: 1.15em;
+      max-width: 600px;
+      margin: 1.1em auto 1.7em auto;
+      color: #dafdfa;
+      text-shadow: 0 3px 7px #22ffb480;
+    }
+    .glow-card {
+      background: rgba(25, 24, 90, 0.75);
+      border-radius: 17px;
+      box-shadow: 0 0 18px 3px #27ffbc85, 0 2px 40px #29a2cf40;
+      border: 1.6px solid #2bffa2aa;
+      padding: 30px 25px;
+      margin: 30px auto 38px auto;
+      max-width: 900px;
+      transition: box-shadow 0.23s;
+      backdrop-filter: blur(7px);
+      position: relative;
+    }
+    .glow-card:hover {
+      box-shadow: 0 0 36px 10px #37fff7dd, 0 10px 60px #20799f60;
+    }
+    .features {
+      display: flex;
+      gap: 34px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .feature-block {
+      flex: 1 1 270px;
+      background: rgba(43,255,162,0.11);
+      border: 1.1px solid #24ffd688;
+      border-radius: 10px;
+      padding: 19px 16px 17px 16px;
+      min-width: 210px; max-width: 330px;
+      color: #fff;
+      box-shadow: 0 2px 14px 0 #22ffd699;
+      margin: 9px 0;
+      text-align: left;
+    }
+    .feature-block h3 {
+      color: #25dbc7;
+      font-family: 'Orbitron', 'Montserrat', sans-serif;
+      font-size: 1.18em; margin: 0 0 7px 0;
+      letter-spacing: 0.02em;
+    }
+    .feature-block .emoji {
+      font-size: 1.33em; margin-right: 6px;
+    }
+    .links-bar {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      margin: 37px 0 23px 0;
+      font-size: 1.08em;
+    }
+    .link-btn {
+      background: #2bffa2eb;
+      color: #151927;
+      font-family: 'Orbitron', 'Montserrat', sans-serif;
+      text-decoration: none;
+      font-size: 1.12em;
+      font-weight: bold;
+      padding: 15px 33px;
+      border-radius: 8px;
+      box-shadow: 0 7px 18px #26ffd586;
+      transition: background 0.15s;
+      border: none;
+      letter-spacing: 0.03em;
+    }
+    .link-btn:hover {
+      background: #201474;
+      color: #24ffc4;
+    }
+    .section {
+      background: rgba(22,47,74,0.35);
+      border-radius: 15px;
+      max-width: 900px;
+      margin: 40px auto 0 auto;
+      box-shadow: 0 3px 16px #2bffa244;
+      padding: 36px 32px;
+      color: #effff6;
+    }
+    .section-title {
+      color: #24ffd6;
+      font-family: 'Orbitron', 'Montserrat', sans-serif;
+      font-size: 1.35em;
+      letter-spacing: 0.03em;
+      margin-bottom: 12px;
+      margin-top: 0;
+    }
+    .faq-list, .roadmap-list {
+      list-style: none; padding: 0; margin: 16px 0 0 0;
+    }
+    .faq-list li, .roadmap-list li {margin-bottom: 18px;}
+    .faq-q {color: #2bffa2; font-weight: bold;}
+    .roadmap-step {margin-bottom: 9px;}
+    .team-list {
+      display: flex;
+      gap: 28px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 18px;
+    }
+    .team-card {
+      background: rgba(0,255,128,0.09);
+      border: 1px solid #42ffcc90;
+      border-radius: 10px;
+      padding: 17px;
+      width: 215px;
+      text-align: center;
+      margin-bottom: 11px;
+      box-shadow: 0 1px 7px #22ffd6a6;
+    }
+    .team-name {
+      color: #2bffa2; font-weight: 600; font-size: 1.07em; margin: 7px 0 0 0;
+    }
+    .team-role {font-size: 0.96em; color: #a9ffe6;}
+    footer {
+      text-align: center; padding: 35px 0 12px 0;
+      color: #5cfccb;
+      font-size: 1em;
+      background: none;
+    }
+    @media (max-width: 850px) {
+      .glow-card, .section {padding: 8px;}
+      .features {flex-direction: column; align-items: center;}
+      .team-list {flex-direction: column;}
+    }
+  </style>
+</head>
+<body>
+  <div class="hero">
+    <div class="hero-title">
+      GigChain.io
+    </div>
+    <div class="hero-desc">
+      <span class="hero-highlight">Blockchain-Powered Gigs. Global Trust. Next-Gen Automation.</span><br>
+      Meet the new work economy: AI-powered contracts, borderless payments, game-level reputation, and open access for all. 
+    </div>
+    <div style="color:#7af7e4;font-size:1.08em;">
+      Founded by <span class="hero-highlight">Lejzer Traña</span>
+    </div>
+    <div class="links-bar">
+      <a class="link-btn" href="https://github.com/Lento47/GigChain" target="_blank">🚀 See the Main Project</a>
+      <a class="link-btn" href="#join">✨ Be First to Try</a>
+    </div>
+  </div>
+
+  <div class="glow-card">
+    <div class="features">
+      <div class="feature-block">
+        <h3><span class="emoji">🤖</span>AI Contract Generation</h3>
+        Automated smart contracts, negotiation bots, and dispute mediators with built-in OpenAI.
+      </div>
+      <div class="feature-block">
+        <h3><span class="emoji">🔐</span>Web3 Authentication</h3>
+        Passwordless login, crypto wallets, cryptographic risk scoring, and decentralized identity.
+      </div>
+      <div class="feature-block">
+        <h3><span class="emoji">💼</span>Gig Marketplace</h3>
+        Gigs, payments, XP, levels and NFTs, escrowed and on-chain (Polygon, Ethereum).
+      </div>
+      <div class="feature-block">
+        <h3><span class="emoji">🎮</span>Reputation & Gamification</h3>
+        On-chain profiles, achievements, badges, and transparent feedback for every user.
+      </div>
+    </div>
+  </div>
+  
+  <section class="section">
+    <div class="section-title">Frequently Asked Questions</div>
+    <ul class="faq-list">
+      <li>
+        <span class="faq-q">What is GigChain?</span><br>
+        A decentralized AI-powered platform to connect freelancers and clients through secure blockchain contracts, transparent reputation and instant payments globally.
+      </li>
+      <li>
+        <span class="faq-q">How do I get paid?</span><br>
+        Funds flow through smart contract escrow, automatically released on delivery with verification by both parties.
+      </li>
+      <li>
+        <span class="faq-q">What’s different from Upwork/Fiverr?</span><br>
+        No mediators. No commission fees. Transparent reviews, rapid payments, and your on-chain reputation belongs to you.
+      </li>
+      <li>
+        <span class="faq-q">How can I contribute?</span><br>
+        Check <a href="https://github.com/Lento47/GigChain" target="_blank" style="color:#24ffd6;">Once we deploy, there will be a community</a> — code, docs, contracts, or ideas welcome!
+      </li>
+    </ul>
+  </section>
+
+  <section class="section">
+    <div class="section-title">Roadmap</div>
+    <ul class="roadmap-list">
+      <li class="roadmap-step"><b>Q4 2025:</b> MVP (core contracts, AI chat, profiles, escrow) 🚀</li>
+      <li class="roadmap-step"><b>Q1 2026:</b> NFT-based rep, mobile app alpha, multi-currency support</li>
+      <li class="roadmap-step"><b>Q2 2026:</b> DAO setup, advanced analytics, Layer-2 scaling</li>
+      <li class="roadmap-step"><b>Q3 2026:</b> AI auto-matching, global payout expansion, new gig types</li>
+    </ul>
+  </section>
+
+  <section class="section">
+    <div class="section-title">Meet the Team</div>
+    <div class="team-list">
+      <div class="team-card">
+        <div class="team-name">Lejzer Traña</div>
+        <div class="team-role">Founder & Blockchain Engineer</div>
+        <div>Building fair, borderless, tech-driven gig work for all.</div>
+      </div>
+      <div class="team-card">
+        <div class="team-name">Open for Builders</div>
+        <div class="team-role">Contributors Welcome</div>
+        <div>Want to build in blockchain, AI, or frontend? <a href="https://github.com/Lento47/GigChain/issues" style="color:#39fff9;">Join us!</a></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="join">
+    <div class="section-title">Try Early? Be Notified.</div>
+    <form action="https://formspree.io/f/your-form-id" method="POST" style="margin-top:11px;text-align:center">
+      <input type="email" name="email" required placeholder="Email for invite" style="padding:9px 14px;border-radius:6px;border:1px solid #27ffb9;margin-right:8px;font-size:1em;width:180px;"/>
+      <button class="link-btn" type="submit">Send Me News</button>
+    </form>
+    <div style="color:#31ddbb; font-size:0.98em; margin-top:18px;">
+      Don’t worry, no spam — we’ll ping you when the alpha is open.
+    </div>
+  </section>
+
+  <footer>
+    &copy; 2025 GigChain.io — Launching the decentralized gig economy.<br>
+    <span style="font-size:0.9em;color:#51fcf7;">Blockchain. AI. Freedom to work anywhere.</span>
+  </footer>
+</body>
+</html>
